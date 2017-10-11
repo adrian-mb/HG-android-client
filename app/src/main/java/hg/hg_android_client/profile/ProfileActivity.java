@@ -204,9 +204,10 @@ public class ProfileActivity extends LlevameActivity {
     }
 
 
-
+    // TODO: Fix placeholder log out button.
     public void logoutOnClick(View view) {
         // TODO: Handle logout better (create toolbar, make code common).
+        // TODO: Move strings to xml.
         hideKeyboard();
         String title = "Logging Out";
         String message = "Please wait...";

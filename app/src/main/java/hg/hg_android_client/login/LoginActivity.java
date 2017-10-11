@@ -18,6 +18,7 @@ import hg.hg_android_client.login.event.HideLoginProgress;
 import hg.hg_android_client.login.intent.LoginIntent;
 import hg.hg_android_client.login.repository.TokenRepository;
 import hg.hg_android_client.login.repository.TokenRepositoryFactory;
+import hg.hg_android_client.mainscreen.MainScreenActivity;
 import hg.hg_android_client.model.User;
 import hg.hg_android_client.profile.ProfileActivity;
 import hg.hg_android_client.profile.event.RetrieveSuccess;
@@ -57,6 +58,7 @@ public class LoginActivity extends LlevameActivity {
     }
 
     public void loginOnClick(View view) {
+        hideKeyboard();
         displayProgressDialog();
 
         UiReader reader = new UiReader(this);
@@ -121,12 +123,15 @@ public class LoginActivity extends LlevameActivity {
     }
 
     private void evaluateUserProfile(User user) {
+        Intent i;
+
         if (user != null && user.isProfileComplete()) {
-            // TODO: Go to main screen.
+            i = new Intent(getApplicationContext(), MainScreenActivity.class);
         } else {
-            Intent i = new Intent(getApplicationContext(), ProfileActivity.class);
-            startActivity(i);
+            i = new Intent(getApplicationContext(), ProfileActivity.class);
         }
+
+        startActivity(i);
     }
 
 }
