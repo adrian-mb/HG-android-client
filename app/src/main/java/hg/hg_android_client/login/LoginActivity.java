@@ -19,7 +19,7 @@ import hg.hg_android_client.login.intent.LoginIntent;
 import hg.hg_android_client.login.repository.TokenRepository;
 import hg.hg_android_client.login.repository.TokenRepositoryFactory;
 import hg.hg_android_client.mainscreen.MainScreenActivity;
-import hg.hg_android_client.model.User;
+import hg.hg_android_client.model.Profile;
 import hg.hg_android_client.profile.ProfileActivity;
 import hg.hg_android_client.profile.event.RetrieveSuccess;
 import hg.hg_android_client.profile.intent.RetrieveProfileIntent;
@@ -105,8 +105,8 @@ public class LoginActivity extends LlevameActivity {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRetrieveSuccess(RetrieveSuccess event) {
         dismissDialog();
-        User user = event.getUser();
-        evaluateUserProfile(user);
+        Profile profile = event.getProfile();
+        evaluateUserProfile(profile);
     }
 
     private void retrieveProfile(String token) {
@@ -117,21 +117,22 @@ public class LoginActivity extends LlevameActivity {
 
     private void retrieveCachedProfile() {
         ProfileRepositoryFactory f = new ProfileRepositoryFactory();
-        ProfileRepository r = f.getRepository();
-        User user = r.retrieveCached();
-        evaluateUserProfile(user);
+        ProfileRepository r = f.getRepository(getApplicationContext());
+        Profile profile = r.retrieveCached();
+        evaluateUserProfile(profile);
     }
 
-    private void evaluateUserProfile(User user) {
+    private void evaluateUserProfile(Profile profile) {
         Intent i;
 
-        if (user != null && user.isProfileComplete()) {
+        if (profile != null && profile.isComplete()) {
             i = new Intent(getApplicationContext(), MainScreenActivity.class);
         } else {
             i = new Intent(getApplicationContext(), ProfileActivity.class);
         }
 
         startActivity(i);
+        finish();
     }
 
 }

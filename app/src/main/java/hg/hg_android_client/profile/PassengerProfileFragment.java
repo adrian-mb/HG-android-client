@@ -1,7 +1,6 @@
 package hg.hg_android_client.profile;
 
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,10 +12,6 @@ import java.io.Serializable;
 
 import hg.hg_android_client.R;
 import hg.hg_android_client.model.CreditCard;
-import hg.hg_android_client.model.Passenger;
-import hg.hg_android_client.model.User;
-import hg.hg_android_client.profile.repository.ProfileRepository;
-import hg.hg_android_client.profile.repository.ProfileRepositoryFactory;
 import hg.hg_android_client.util.UiReader;
 
 public class PassengerProfileFragment extends Fragment {

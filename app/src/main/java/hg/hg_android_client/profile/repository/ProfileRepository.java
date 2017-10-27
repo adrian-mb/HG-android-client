@@ -1,13 +1,13 @@
 package hg.hg_android_client.profile.repository;
 
-import hg.hg_android_client.model.User;
+import hg.hg_android_client.model.Profile;
 
 public interface ProfileRepository {
 
-    User retrieve(String token);
+    Profile retrieve(String token);
 
-    User retrieveCached();
+    Profile retrieveCached();
 
-    User update(String token, User user);
+    Profile update(String token, Profile profile);
 
 }

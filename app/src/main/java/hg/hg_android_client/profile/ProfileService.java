@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 
 import org.greenrobot.eventbus.EventBus;
 
-import hg.hg_android_client.model.User;
+import hg.hg_android_client.model.Profile;
 import hg.hg_android_client.profile.event.RetrieveSuccess;
 import hg.hg_android_client.profile.event.UpdateSuccess;
 import hg.hg_android_client.profile.intent.RetrieveProfileIntent;
@@ -36,30 +36,31 @@ public class ProfileService extends IntentService {
                 retrieveProfile(takeSessionToken(intent));
                 break;
             case UpdateProfileIntent.ACTION:
-                User user = (User) intent.getSerializableExtra(UpdateProfileIntent.KEY_USER);
-                updateProfile(takeSessionToken(intent), user);
+                Profile profile = (Profile) intent
+                        .getSerializableExtra(UpdateProfileIntent.KEY_PROFILE);
+                updateProfile(takeSessionToken(intent), profile);
             default:
                 break;
         }
     }
 
     private void retrieveProfile(String token) {
-        User user = new ProfileRepositoryFactory()
-                .getRepository()
+        Profile profile = new ProfileRepositoryFactory()
+                .getRepository(getApplicationContext())
                 .retrieve(token);
 
-        if (user != null) {
-            RetrieveSuccess e = new RetrieveSuccess(user);
+        if (profile != null) {
+            RetrieveSuccess e = new RetrieveSuccess(profile);
             EventBus.getDefault().post(e);
         } else {
             // TODO: Handle error case.
         }
     }
 
-    private void updateProfile(String token, User user) {
-        User updated = new ProfileRepositoryFactory()
-                .getRepository()
-                .update(token, user);
+    private void updateProfile(String token, Profile profile) {
+        Profile updated = new ProfileRepositoryFactory()
+                .getRepository(getApplicationContext())
+                .update(token, profile);
 
         if (updated != null) {
             UpdateSuccess e = new UpdateSuccess();

@@ -77,7 +77,7 @@ public class IdentityService extends IntentService {
         String usermail = intent.getStringExtra(RegistrationIntent.KEY_USERMAIL);
 
         RegistrationEndpoint.Response response = new RegistrationEndpointFactory()
-                .getEndpoint().request(username, password, usermail);
+                .getEndpoint(getApplicationContext()).request(username, password, usermail);
 
         if (response.isSuccess()) {
             RegistrationSuccess e = new RegistrationSuccess();
@@ -93,7 +93,7 @@ public class IdentityService extends IntentService {
         String password = intent.getStringExtra(LoginIntent.KEY_PASSWORD);
 
         LoginEndpoint.Response response = new LoginEndpointFactory()
-                .getEndpoint().login(username, password);
+                .getEndpoint(getApplicationContext()).login(username, password);
 
         if (response.isSuccess()) {
             cacheToken(response.getToken());

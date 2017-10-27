@@ -1,15 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/Padded"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/profile_parent"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/logout_button"
-        android:text="@string/profile_logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="logoutOnClick"/>
+    <include layout="@layout/toolbar"/>
 
-</RelativeLayout>
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        tools:context="hg.hg_android_client.mainscreen.MainScreenActivity" />
+
+    <LinearLayout
+        style="@style/Padded"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="0dip">
+
+    </LinearLayout>
+
+</LinearLayout>

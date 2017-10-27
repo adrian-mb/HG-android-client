@@ -12,10 +12,6 @@ import java.io.Serializable;
 
 import hg.hg_android_client.R;
 import hg.hg_android_client.model.Car;
-import hg.hg_android_client.model.Driver;
-import hg.hg_android_client.model.User;
-import hg.hg_android_client.profile.repository.ProfileRepository;
-import hg.hg_android_client.profile.repository.ProfileRepositoryFactory;
 import hg.hg_android_client.util.UiReader;
 
 public class DriverProfileFragment extends Fragment {

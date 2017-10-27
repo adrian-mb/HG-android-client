@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -15,19 +17,17 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import hg.hg_android_client.R;
 import hg.hg_android_client.login.LoginActivity;
-import hg.hg_android_client.login.event.LogoutSuccess;
 import hg.hg_android_client.login.intent.LogoutIntent;
 import hg.hg_android_client.login.repository.TokenRepository;
 import hg.hg_android_client.login.repository.TokenRepositoryFactory;
 import hg.hg_android_client.model.Car;
-import hg.hg_android_client.model.CreditCard;
-import hg.hg_android_client.model.Driver;
-import hg.hg_android_client.model.Passenger;
-import hg.hg_android_client.model.User;
+import hg.hg_android_client.model.Profile;
+import hg.hg_android_client.model.ProfileBuilder;
 import hg.hg_android_client.profile.event.UpdateSuccess;
 import hg.hg_android_client.profile.intent.UpdateProfileIntent;
 import hg.hg_android_client.profile.repository.ProfileRepository;
 import hg.hg_android_client.profile.repository.ProfileRepositoryFactory;
+import hg.hg_android_client.util.CommonUtil;
 import hg.hg_android_client.util.EditableFieldComponent;
 import hg.hg_android_client.util.LlevameActivity;
 import hg.hg_android_client.util.UiReader;
@@ -41,11 +41,10 @@ public class ProfileActivity extends LlevameActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        User user = retrieveCachedUser();
+        Profile user = retrieveCachedProfile();
 
         if (user == null) {
-            Intent i = new Intent(getApplicationContext(), LoginActivity.class);
-            startActivity(i);
+            logout();
         }
 
         initializeComponents(user);
@@ -54,13 +53,13 @@ public class ProfileActivity extends LlevameActivity {
         }
     }
 
-    private User retrieveCachedUser() {
+    private Profile retrieveCachedProfile() {
         ProfileRepositoryFactory f = new ProfileRepositoryFactory();
-        ProfileRepository r = f.getRepository();
+        ProfileRepository r = f.getRepository(getApplicationContext());
         return r.retrieveCached();
     }
 
-    private void initializeComponents(User user) {
+    private void initializeComponents(Profile profile) {
         // TODO: Mark required fields that are missing.
 
         UiReader reader = new UiReader(this);
@@ -81,11 +80,11 @@ public class ProfileActivity extends LlevameActivity {
         };
 
         String[] values = new String[4];
-        if (user != null) {
-            values[0] = user.getFirstName();
-            values[1] = user.getLastName();
-            values[2] = user.getBirthdate();
-            values[3] = user.getLocation();
+        if (profile != null) {
+            values[0] = profile.getFirstname();
+            values[1] = profile.getLastname();
+            values[2] = profile.getBirthdate();
+            values[3] = profile.getCountry();
         }
 
         for (int i = 0; i < id.length; i++) {
@@ -97,20 +96,22 @@ public class ProfileActivity extends LlevameActivity {
         }
     }
 
-    private void initializeFragments(User user) {
+    private void initializeFragments(Profile profile) {
         Bundle arguments = new Bundle();
-        Fragment fragment;
+        Fragment fragment = null;
 
-        if (User.Role.DRIVER.equals(user.getRole())) {
-            checkRadio(R.id.radio_driver);
-            arguments.putSerializable(KEY_CAR, ((Driver)user).getCar());
-            fragment = new DriverProfileFragment();
-        } else if (User.Role.PASSENGER.equals(user.getRole())) {
-            checkRadio(R.id.radio_passenger);
-            arguments.putSerializable(KEY_CARD, ((Passenger)user).getCreditCard());
-            fragment = new PassengerProfileFragment();
-        } else {
+        if (profile == null || CommonUtil.empty(profile.getType())) {
             fragment = new NoneSelectedFragment();
+        } else if (profile.isDriver()) {
+            checkRadio(R.id.radio_driver);
+            disableRadio(R.id.radio_passenger);
+            arguments.putSerializable(KEY_CAR, profile.getFirstCar());
+            fragment = new DriverProfileFragment();
+        } else if (profile.isPassenger()) {
+            checkRadio(R.id.radio_passenger);
+            disableRadio(R.id.radio_driver);
+            arguments.putSerializable(KEY_CARD, null);
+            fragment = new PassengerProfileFragment();
         }
 
         fragment.setArguments(arguments);
@@ -124,6 +125,11 @@ public class ProfileActivity extends LlevameActivity {
     private void checkRadio(int id) {
         RadioButton r = (RadioButton) findViewById(id);
         r.setChecked(true);
+    }
+
+    private void disableRadio(int id) {
+        RadioButton r = (RadioButton) findViewById(id);
+        r.setClickable(false);
     }
 
     public void onDriverSelected(View view) {
@@ -141,7 +147,7 @@ public class ProfileActivity extends LlevameActivity {
                 .commit();
     }
 
-    public void updateProfileOnClick(View view) {
+    public void handleUpdateProfile() {
         // TODO: Implement scrolling for profile activity.
         hideKeyboard();
         String title = getResources().getString(R.string.profile_updating);
@@ -157,30 +163,31 @@ public class ProfileActivity extends LlevameActivity {
         return r.getToken();
     }
 
-    private User createUser() {
+    private Profile createUser() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_container);
 
         View parent = findViewById(R.id.profile_parent);
 
-        String firstname = readComponent(parent, R.id.first_name);
-        String lastname = readComponent(parent, R.id.last_name);
-        String location = readComponent(parent, R.id.location);
-        String birthdate = readComponent(parent, R.id.birthdate);
+        ProfileBuilder builder = new ProfileBuilder()
+                .withFirstName(readComponent(parent, R.id.first_name))
+                .withLastName(readComponent(parent, R.id.last_name))
+                .withCountry(readComponent(parent, R.id.location))
+                .withBirthdate(readComponent(parent, R.id.birthdate));
 
         RadioGroup g = (RadioGroup) findViewById(R.id.role_radios);
         int selectedId = g.getCheckedRadioButtonId();
 
         if (selectedId == R.id.radio_driver) {
             Car car = ((DriverProfileFragment) fragment).getCar();
-            return new Driver(firstname, lastname, location, birthdate, car);
+            builder.withDriverCharacter().withAdditionalCar(car);
         } else if (selectedId == R.id.radio_passenger) {
-            CreditCard card = ((PassengerProfileFragment) fragment).getCreditCard();
-            return new Passenger(firstname, lastname, location, birthdate, card);
-        } else {
-            // TODO: Validate whether all the data is complete; we should not hit this else.
-            return null;
+            // TODO What should we do here?
         }
+
+        // TODO Validate whether profile is complete. Throw exception or something if not.
+
+        return builder.build();
     }
 
     private String readComponent(View parent, int id) {
@@ -203,24 +210,24 @@ public class ProfileActivity extends LlevameActivity {
         displayConfirmationDialog(message, buttonMessage, handler);
     }
 
-
-    // TODO: Fix placeholder log out button.
-    public void logoutOnClick(View view) {
-        // TODO: Handle logout better (create toolbar, make code common).
-        // TODO: Move strings to xml.
-        hideKeyboard();
-        String title = "Logging Out";
-        String message = "Please wait...";
-        showDialog(title, message);
-        Intent i = new LogoutIntent(getApplicationContext());
-        startService(i);
+    @Override
+    public boolean onCreateOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.profile_menu, menu);
+        return true;
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onLogoutSuccess(LogoutSuccess event) {
-        dismissDialog();
-        Intent i = new Intent(getApplicationContext(), LoginActivity.class);
-        startActivity(i);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.menu_save_profile_action:
+                handleUpdateProfile();
+                return true;
+            case R.id.menu_logout_action:
+                handleLogout();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 }

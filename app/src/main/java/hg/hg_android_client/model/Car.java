@@ -2,6 +2,8 @@ package hg.hg_android_client.model;
 
 import java.io.Serializable;
 
+import hg.hg_android_client.util.CommonUtil;
+
 public class Car implements Serializable {
     private final String patent;
     private final String model;
@@ -21,6 +23,10 @@ public class Car implements Serializable {
 
     public String getModel() {
         return model;
+    }
+
+    public boolean detailsComplete() {
+        return !CommonUtil.empty(patent) && !CommonUtil.empty(model);
     }
 
 }

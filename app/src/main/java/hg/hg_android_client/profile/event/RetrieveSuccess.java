@@ -1,17 +1,17 @@
 package hg.hg_android_client.profile.event;
 
-import hg.hg_android_client.model.User;
+import hg.hg_android_client.model.Profile;
 
 public class RetrieveSuccess {
 
-    private User user;
+    private Profile profile;
 
-    public RetrieveSuccess(User user) {
-        this.user = user;
+    public RetrieveSuccess(Profile user) {
+        this.profile = user;
     }
 
-    public User getUser() {
-        return user;
+    public Profile getProfile() {
+        return profile;
     }
 
 }

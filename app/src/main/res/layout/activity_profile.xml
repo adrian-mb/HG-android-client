@@ -1,91 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/Padded"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/profile_parent"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/basic_form"
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <include layout="@layout/component_editable_field"
-            android:id="@+id/first_name" />
-
-        <include layout="@layout/component_editable_field"
-            android:id="@+id/last_name" />
-
-        <include layout="@layout/component_editable_field"
-            android:id="@+id/birthdate" />
-
-        <include layout="@layout/component_editable_field"
-            android:id="@+id/location" />
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/save_button"
-        android:text="@string/profile_save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:onClick="updateProfileOnClick"/>
-
-    <Button
-        android:id="@+id/logout_button"
-        android:text="@string/profile_logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="@id/save_button"
-        android:onClick="logoutOnClick"/>
+    <include layout="@layout/toolbar" />
 
     <LinearLayout
-        style="@style/Contrast"
+        style="@style/Padded"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/basic_form"
-        android:layout_above="@id/save_button">
+        android:layout_height="match_parent">
 
-        <RadioGroup
-            android:id="@+id/role_radios"
-            android:orientation="horizontal"
+        <LinearLayout
+            android:id="@+id/basic_form"
+            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
-                android:text="@string/profile_iam"
-                android:layout_weight="3"
-                android:layout_width="0px"
-                android:layout_height="wrap_content" />
+            <include layout="@layout/component_editable_field"
+                android:id="@+id/first_name" />
 
-            <RadioButton
-                android:id="@+id/radio_passenger"
-                android:text="@string/passenger"
-                android:layout_weight="3"
-                android:layout_width="0px"
-                android:layout_height="wrap_content"
-                android:onClick="onPassengerSelected"/>
+            <include layout="@layout/component_editable_field"
+                android:id="@+id/last_name" />
 
-            <RadioButton
-                android:id="@+id/radio_driver"
-                android:text="@string/driver"
-                android:layout_weight="2"
-                android:layout_width="0px"
-                android:layout_height="wrap_content"
-                android:onClick="onDriverSelected"/>
+            <include layout="@layout/component_editable_field"
+                android:id="@+id/birthdate" />
 
-        </RadioGroup>
+            <include layout="@layout/component_editable_field"
+                android:id="@+id/location" />
 
-        <RelativeLayout
-            android:id="@+id/fragment_container"
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/Contrast"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent">
+
+            <RadioGroup
+                android:id="@+id/role_radios"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:text="@string/profile_iam"
+                    android:layout_weight="3"
+                    android:layout_width="0px"
+                    android:layout_height="wrap_content" />
+
+                <RadioButton
+                    android:id="@+id/radio_passenger"
+                    android:text="@string/passenger"
+                    android:layout_weight="3"
+                    android:layout_width="0px"
+                    android:layout_height="wrap_content"
+                    android:onClick="onPassengerSelected"/>
+
+                <RadioButton
+                    android:id="@+id/radio_driver"
+                    android:text="@string/driver"
+                    android:layout_weight="2"
+                    android:layout_width="0px"
+                    android:layout_height="wrap_content"
+                    android:onClick="onDriverSelected"/>
+
+            </RadioGroup>
+
+            <RelativeLayout
+                android:id="@+id/fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>
