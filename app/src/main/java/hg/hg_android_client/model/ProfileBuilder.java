@@ -9,12 +9,12 @@ public class ProfileBuilder {
     }
 
     public ProfileBuilder withFirstName(String firstname) {
-        built.setFirstname(firstname);
+        built.setFirstName(firstname);
         return this;
     }
 
     public ProfileBuilder withLastName(String lastname) {
-        built.setLastname(lastname);
+        built.setLastName(lastname);
         return this;
     }
 
@@ -29,8 +29,13 @@ public class ProfileBuilder {
     }
 
     public DriverProfileBuilder withDriverCharacter() {
-        built.setType(Profile.UserType.DRIVER);
+        built.makeDriver();
         return new DriverProfileBuilder();
+    }
+
+    public PassengerProfileBuilder withPassengerCharacter() {
+        built.makePassenger();
+        return new PassengerProfileBuilder();
     }
 
     public Profile build() {
@@ -43,6 +48,14 @@ public class ProfileBuilder {
             built.addCar(car);
             return this;
         }
+
+        public Profile build() {
+            return ProfileBuilder.this.build();
+        }
+
+    }
+
+    public class PassengerProfileBuilder {
 
         public Profile build() {
             return ProfileBuilder.this.build();

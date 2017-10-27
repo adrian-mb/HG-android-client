@@ -1,8 +1,9 @@
 package hg.hg_android_client.model;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class DriverSpecifics implements ProfileSpecifics {
+public class DriverSpecifics implements ProfileSpecifics, Serializable {
 
     private Profile parent;
 

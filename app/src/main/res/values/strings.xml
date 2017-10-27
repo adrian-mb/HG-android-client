@@ -52,6 +52,7 @@
     <string name="profile_updating">Updating Profile</string>
     <string name="profile_updating_message">Please wait...</string>
     <string name="profile_update_success">Update Successful</string>
+    <string name="profile_incomplete">Please fill all data fields</string>
 
     <string name="menu_profile">Profile</string>
     <string name="menu_logout">Sign Out</string>

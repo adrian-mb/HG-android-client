@@ -16,10 +16,9 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import hg.hg_android_client.R;
-import hg.hg_android_client.login.LoginActivity;
-import hg.hg_android_client.login.intent.LogoutIntent;
 import hg.hg_android_client.login.repository.TokenRepository;
 import hg.hg_android_client.login.repository.TokenRepositoryFactory;
+import hg.hg_android_client.mainscreen.MainScreenActivity;
 import hg.hg_android_client.model.Car;
 import hg.hg_android_client.model.Profile;
 import hg.hg_android_client.model.ProfileBuilder;
@@ -81,8 +80,8 @@ public class ProfileActivity extends LlevameActivity {
 
         String[] values = new String[4];
         if (profile != null) {
-            values[0] = profile.getFirstname();
-            values[1] = profile.getLastname();
+            values[0] = profile.getFirstName();
+            values[1] = profile.getLastName();
             values[2] = profile.getBirthdate();
             values[3] = profile.getCountry();
         }
@@ -150,11 +149,18 @@ public class ProfileActivity extends LlevameActivity {
     public void handleUpdateProfile() {
         // TODO: Implement scrolling for profile activity.
         hideKeyboard();
-        String title = getResources().getString(R.string.profile_updating);
-        String message = getResources().getString(R.string.profile_updating_message);
-        showDialog(title, message);
-        Intent i = new UpdateProfileIntent(this, getToken(), createUser());
-        this.startService(i);
+
+        Profile update = createProfile();
+
+        if (update.isComplete()) {
+            String title = getString(R.string.profile_updating);
+            String message = getString(R.string.profile_updating_message);
+            showDialog(title, message);
+            Intent i = new UpdateProfileIntent(this, getToken(), update);
+            this.startService(i);
+        } else {
+            displayIncompleteProfile();
+        }
     }
 
     private String getToken() {
@@ -163,7 +169,7 @@ public class ProfileActivity extends LlevameActivity {
         return r.getToken();
     }
 
-    private Profile createUser() {
+    private Profile createProfile() {
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_container);
 
@@ -182,10 +188,8 @@ public class ProfileActivity extends LlevameActivity {
             Car car = ((DriverProfileFragment) fragment).getCar();
             builder.withDriverCharacter().withAdditionalCar(car);
         } else if (selectedId == R.id.radio_passenger) {
-            // TODO What should we do here?
+            builder.withPassengerCharacter();
         }
-
-        // TODO Validate whether profile is complete. Throw exception or something if not.
 
         return builder.build();
     }
@@ -198,6 +202,23 @@ public class ProfileActivity extends LlevameActivity {
     public void onUpdateSuccess(UpdateSuccess event) {
         dismissDialog();
         String message = getString(R.string.profile_update_success);
+        String buttonMessage = getString(R.string.OK);
+
+        AlertDialog.OnClickListener handler = new AlertDialog.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                dialog.dismiss();
+                Intent j = new Intent(getApplicationContext(), MainScreenActivity.class);
+                startActivity(j);
+            }
+        };
+
+        displayConfirmationDialog(message, buttonMessage, handler);
+    }
+
+    private void displayIncompleteProfile() {
+        dismissDialog();
+        String message = getString(R.string.profile_incomplete);
         String buttonMessage = getString(R.string.OK);
 
         AlertDialog.OnClickListener handler = new AlertDialog.OnClickListener() {

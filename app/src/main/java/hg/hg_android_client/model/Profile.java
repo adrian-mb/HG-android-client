@@ -1,5 +1,6 @@
 package hg.hg_android_client.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -13,8 +14,8 @@ import hg.hg_android_client.util.CommonUtil;
 @JsonDeserialize(using = ProfileDeserializer.class)
 public class Profile implements Serializable {
 
-    private String firstname;
-    private String lastname;
+    private String firstName;
+    private String lastName;
     private String country;
     private String birthdate;
     private UserType type;
@@ -27,12 +28,12 @@ public class Profile implements Serializable {
         this.cars = new ArrayList<>();
     }
 
-    public String getFirstname() {
-        return firstname;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public String getLastname() {
-        return lastname;
+    public String getLastName() {
+        return lastName;
     }
 
     public String getCountry() {
@@ -51,12 +52,12 @@ public class Profile implements Serializable {
         return cars;
     }
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
+    public void setFirstName(String firstname) {
+        this.firstName = firstname;
     }
 
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
+    public void setLastName(String lastname) {
+        this.lastName = lastname;
     }
 
     public void setCountry(String country) {
@@ -75,8 +76,14 @@ public class Profile implements Serializable {
         }
     }
 
-    public void setType(UserType type) {
-        this.type = type;
+    public void makeDriver() {
+        this.type = UserType.DRIVER;
+        this.specifics = new DriverSpecifics(this);
+    }
+
+    public void makePassenger() {
+        this.type = UserType.PASSENGER;
+        this.specifics = new PassengerSpecifics(this);
     }
 
     public void addCar(Car car) {
@@ -89,14 +96,17 @@ public class Profile implements Serializable {
         this.cars = cars;
     }
 
+    @JsonIgnore
     public boolean isDriver() {
         return UserType.DRIVER.equals(type);
     }
 
+    @JsonIgnore
     public boolean isPassenger() {
         return UserType.PASSENGER.equals(type);
     }
 
+    @JsonIgnore
     public Car getFirstCar() {
         if (cars != null && cars.size() > 0) {
             return cars.get(0);
@@ -105,10 +115,11 @@ public class Profile implements Serializable {
         }
     }
 
+    @JsonIgnore
     public boolean isComplete() {
         String nonnullables[] = {
-                firstname,
-                lastname,
+                firstName,
+                lastName,
                 country,
                 birthdate
         };
@@ -121,6 +132,7 @@ public class Profile implements Serializable {
         return basicsComplete && subprofileComplete();
     }
 
+    @JsonIgnore
     private boolean subprofileComplete() {
         return specifics != null && specifics.detailsComplete();
     }
