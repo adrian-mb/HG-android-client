@@ -19,6 +19,7 @@ import hg.hg_android_client.R;
 import hg.hg_android_client.login.LoginActivity;
 import hg.hg_android_client.login.event.LogoutSuccess;
 import hg.hg_android_client.login.intent.LogoutIntent;
+import hg.hg_android_client.mainscreen.services.TripService;
 
 public class LlevameActivity extends AppCompatActivity {
 
@@ -73,8 +74,17 @@ public class LlevameActivity extends AppCompatActivity {
             String message,
             String buttonMessage,
             AlertDialog.OnClickListener handler) {
+        displayConfirmationDialog(null, message, buttonMessage, handler);
+    }
+
+    protected void displayConfirmationDialog(
+            String title,
+            String message,
+            String buttonMessage,
+            AlertDialog.OnClickListener handler) {
         AlertDialog dialog = new AlertDialog.Builder(this).create();
-        dialog.setTitle(message);
+        dialog.setTitle(title);
+        dialog.setMessage(message);
         dialog.setButton(AlertDialog.BUTTON_NEUTRAL, buttonMessage, handler);
         dialog.show();
     }
@@ -82,6 +92,12 @@ public class LlevameActivity extends AppCompatActivity {
     protected void logout() {
         Intent logout = new LogoutIntent(getApplicationContext());
         startService(logout);
+    }
+
+    protected void stopTripService() {
+        Intent i = new Intent(getApplicationContext(), TripService.class);
+        i.setAction(TripService.ACTION_STOP);
+        startService(i);
     }
 
     protected void handleLogout() {
@@ -99,6 +115,12 @@ public class LlevameActivity extends AppCompatActivity {
         Intent i = new Intent(getApplicationContext(), LoginActivity.class);
         startActivity(i);
         finish();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        dismissDialog();
     }
 
 }

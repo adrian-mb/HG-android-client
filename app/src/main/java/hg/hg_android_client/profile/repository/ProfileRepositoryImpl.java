@@ -11,9 +11,6 @@ import hg.hg_android_client.util.LlevameEndpoint;
 
 public class ProfileRepositoryImpl extends LlevameEndpoint implements ProfileRepository {
 
-    // TODO Implement JSON response management.
-    // TODO Create some user factory.
-
     private final String KEY_ENDPOINT = "endpoint.profile";
     private final String ENDPOINT;
 

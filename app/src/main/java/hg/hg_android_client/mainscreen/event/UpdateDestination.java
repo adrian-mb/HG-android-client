@@ -1,8 +1,17 @@
 package hg.hg_android_client.mainscreen.event;
 
-/**
- * Created by amb on 29/10/17.
- */
+import com.google.android.gms.maps.model.LatLng;
 
 public class UpdateDestination {
+
+    private LatLng position;
+
+    public UpdateDestination(LatLng position) {
+        this.position = position;
+    }
+
+    public LatLng getPosition() {
+        return position;
+    }
+
 }

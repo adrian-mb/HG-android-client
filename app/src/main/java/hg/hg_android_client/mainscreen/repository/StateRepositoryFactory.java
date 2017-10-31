@@ -1,8 +1,11 @@
 package hg.hg_android_client.mainscreen.repository;
 
-/**
- * Created by amb on 29/10/17.
- */
+import android.content.Context;
 
 public class StateRepositoryFactory {
+
+    public StateRepository get(Context context) {
+        return new StateRepositoryImpl(context);
+    }
+
 }

@@ -54,9 +54,9 @@ public class ProfileDeserializer extends StdDeserializer<Profile> {
 
         if (type != null) {
             String value = type.textValue();
-            if (TYPE_DRIVER.equals(value)) {
+            if (TYPE_DRIVER.equalsIgnoreCase(value)) {
                 buildDriver(builder, node);
-            } else if (TYPE_PASSENGER.equals(value)) {
+            } else if (TYPE_PASSENGER.equalsIgnoreCase(value)) {
                 buildPassenger(builder, node);
             }
         }
@@ -79,7 +79,7 @@ public class ProfileDeserializer extends StdDeserializer<Profile> {
     }
 
     private void buildPassenger(ProfileBuilder builder, JsonNode node) {
-
+        builder.withPassengerCharacter();
     }
 
     private String extract(JsonNode node, String key) {

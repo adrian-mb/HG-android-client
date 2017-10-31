@@ -53,21 +53,13 @@ public class LlevameEndpoint {
     }
 
     protected <T> String toJson(T object) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            return null;
-        }
+        JsonTransform t = new JsonTransform();
+        return t.toJson(object);
     }
 
     protected <T> T fromJson(String json, Class<T> objectType) {
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.readValue(json, objectType);
-        } catch (IOException e) {
-            return null;
-        }
+        JsonTransform t = new JsonTransform();
+        return t.fromJson(json, objectType);
     }
 
     protected <T> T get(

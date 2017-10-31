@@ -23,6 +23,8 @@ import hg.hg_android_client.login.repository.RegistrationEndpoint;
 import hg.hg_android_client.login.repository.RegistrationEndpointFactory;
 import hg.hg_android_client.login.repository.TokenRepository;
 import hg.hg_android_client.login.repository.TokenRepositoryFactory;
+import hg.hg_android_client.mainscreen.repository.StateRepository;
+import hg.hg_android_client.mainscreen.repository.StateRepositoryFactory;
 
 public class IdentityService extends IntentService {
 
@@ -63,6 +65,7 @@ public class IdentityService extends IntentService {
         String token  = intent.getStringExtra(FacebookAuthenticationIntent.KEY_TOKEN);
 
         /*
+         * TODO: Facebook authentication.
          * Send authentication event to application server;
          * should create user if it does not exist.
          */
@@ -97,6 +100,7 @@ public class IdentityService extends IntentService {
 
         if (response.isSuccess()) {
             cacheToken(response.getToken());
+            resetApplicationState();
             AuthSuccess e = new AuthSuccess(response.getToken());
             EventBus.getDefault().post(e);
         } else {
@@ -109,6 +113,12 @@ public class IdentityService extends IntentService {
         TokenRepositoryFactory f = new TokenRepositoryFactory();
         TokenRepository r = f.getRepository(getApplicationContext());
         r.updateToken(token);
+    }
+
+    private void resetApplicationState() {
+        StateRepositoryFactory f = new StateRepositoryFactory();
+        StateRepository r = f.get(getApplicationContext());
+        r.clear();
     }
 
     private void handleLogout(Intent intent) {

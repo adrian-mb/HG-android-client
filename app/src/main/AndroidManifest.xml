@@ -57,12 +57,25 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".mainscreen.ExitActivity"
+            android:theme="@android:style/Theme.NoDisplay"
+            android:autoRemoveFromRecents="true"/>
+
         <service
             android:name=".login.IdentityService"
             android:exported="false" />
 
         <service
             android:name=".profile.ProfileService"
+            android:exported="false" />
+
+        <service
+            android:name=".mainscreen.services.TripService"
+            android:exported="false" />
+
+        <service
+            android:name=".mainscreen.select_path.PathFindingService"
             android:exported="false" />
 
         <meta-data
@@ -76,5 +89,7 @@
     </application>
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
 </manifest>

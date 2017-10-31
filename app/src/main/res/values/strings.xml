@@ -65,4 +65,29 @@
     <string name="endpoint_login_bad_auth">Wrong username or password</string>
     <string name="endpoint_login_bad_request">Bad request</string>
 
+    <string name="fg_notification_text">Running location and trip services</string>
+
+    <string name="action_stop">Stop</string>
+
+    <string name="permissions_required">Error</string>
+    <string name="permissions_required_message">This application requires location permissions</string>
+    <string name="close_app">Close App</string>
+
+    <string name="location_me">Me</string>
+    <string name="location_destination">Destination</string>
+
+    <string name="select_destination">Please select destination and tap confirm</string>
+    <string name="select_destination_first">Tap on the map to select destination</string>
+    <string name="select_destination_button">Confirm</string>
+
+    <string name="button_confirm">Confirm</string>
+    <string name="button_cancel">Cancel</string>
+
+    <string name="please_select_path">Please select path first</string>
+
+    <string name="finding_paths_title">Finding Paths</string>
+    <string name="finding_paths_message">Please wait...</string>
+
+    <string name="path_list_item">Path #</string>
+
 </resources>

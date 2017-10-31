@@ -17,11 +17,12 @@
         tools:context="hg.hg_android_client.mainscreen.MainScreenActivity" />
 
     <LinearLayout
-        style="@style/Padded"
+        android:id="@+id/state_container"
         android:layout_weight="1"
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="0dip">
+        android:layout_height="0dip"
+        style="@style/Padded">
 
     </LinearLayout>
 

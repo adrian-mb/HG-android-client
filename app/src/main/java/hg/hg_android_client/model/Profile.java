@@ -138,8 +138,8 @@ public class Profile implements Serializable {
     }
 
     public enum UserType {
-        DRIVER("DRIVER"),
-        PASSENGER("PASSENGER");
+        DRIVER("driver"),
+        PASSENGER("passenger");
 
         private String stringRepresentation;
 
