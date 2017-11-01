@@ -80,6 +80,7 @@
     <string name="select_destination_first">Tap on the map to select destination</string>
     <string name="select_destination_button">Confirm</string>
 
+    <string name="button_refresh">Refresh</string>
     <string name="button_confirm">Confirm</string>
     <string name="button_cancel">Cancel</string>
 
@@ -89,5 +90,11 @@
     <string name="finding_paths_message">Please wait...</string>
 
     <string name="path_list_item">Path #</string>
+
+    <string name="please_select_driver">Please select driver first</string>
+    <string name="please_select_driver_detail">Please pick a driver (tap name to see location)</string>
+
+    <string name="finding_drivers_title">Finding Drivers</string>
+    <string name="please_wait">Please wait...</string>
 
 </resources>

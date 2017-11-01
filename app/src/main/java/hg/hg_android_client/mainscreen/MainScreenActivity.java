@@ -3,7 +3,6 @@ package hg.hg_android_client.mainscreen;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -27,17 +26,18 @@ import org.greenrobot.eventbus.ThreadMode;
 import hg.hg_android_client.R;
 import hg.hg_android_client.mainscreen.event.CancelTripSetup;
 import hg.hg_android_client.mainscreen.event.ConfirmPath;
-import hg.hg_android_client.mainscreen.event.LocationUpdate;
+import hg.hg_android_client.mainscreen.event.SelectDriver;
+import hg.hg_android_client.mainscreen.event.UpdateLocation;
 import hg.hg_android_client.mainscreen.event.SendSelectMessage;
 import hg.hg_android_client.mainscreen.event.ShowPath;
 import hg.hg_android_client.mainscreen.event.UpdateDestination;
-import hg.hg_android_client.mainscreen.repository.StateRepository;
-import hg.hg_android_client.mainscreen.repository.StateRepositoryFactory;
 import hg.hg_android_client.mainscreen.select_destination.SelectDestinationFragment;
-import hg.hg_android_client.mainscreen.select_path.Path;
+import hg.hg_android_client.mainscreen.select_driver.Driver;
+import hg.hg_android_client.mainscreen.select_driver.SelectDriverFragment;
 import hg.hg_android_client.mainscreen.select_path.SelectPathFragment;
 import hg.hg_android_client.mainscreen.services.TripService;
 import hg.hg_android_client.mainscreen.state.StateKey;
+import hg.hg_android_client.mainscreen.state.StateVector;
 import hg.hg_android_client.profile.ProfileActivity;
 import hg.hg_android_client.util.BitmapLoader;
 import hg.hg_android_client.util.LlevameActivity;
@@ -57,9 +57,11 @@ public class MainScreenActivity extends LlevameActivity implements
 
     private Marker locationMarker;
     private Marker destinationMarker;
+    private Marker driverMarker;
 
-    private Path selectedPath;
-    private Polyline selectedPathPoly;
+    private Polyline selectedPath;
+
+    private StateVector statevector;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -138,12 +140,11 @@ public class MainScreenActivity extends LlevameActivity implements
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onLocationUpdate(LocationUpdate event) {
+    public void onLocationUpdate(UpdateLocation event) {
         updateLocation(event.getLocation());
     }
 
-    private void updateLocation(Location location) {
-        LatLng position = new LatLng(location.getLatitude(), location.getLongitude());
+    private void updateLocation(LatLng position) {
         if (locationMarker == null) {
             MarkerOptions opts = new MarkerOptions();
             opts.title(getString(R.string.location_me));
@@ -155,6 +156,8 @@ public class MainScreenActivity extends LlevameActivity implements
         } else {
             locationMarker.setPosition(position);
         }
+        statevector.setOrigin(position);
+        statevector.persist(getApplicationContext());
     }
 
     @Override
@@ -214,25 +217,17 @@ public class MainScreenActivity extends LlevameActivity implements
     //----------------------------------------------------------------------------------------------
 
     private void initializeFragment() {
-        StateKey state = retrieveState();
+        statevector = StateVector.load(getApplicationContext());
 
-        switch (state) {
-            case PASSENGER_SELECT_DESTINATION:
-                initializePassengerSelectDestination();
-                break;
-            case DRIVER_WAIT_FOR_TRIP_REQUEST:
-                // TODO initializeDriverWaitForTrip();
-                break;
-            case PASSENGER_SELECT_PATH:
-                initializePassengerSelectPath();
-                break;
+        if (statevector.isPassengerPickingDestination()) {
+            initializePassengerSelectDestination();
+        } else if (statevector.isPassengerPickingPath()) {
+            initializePassengerSelectPath();
+        } else if (statevector.isPassengerPickingDriver()) {
+            initializePassengerSelectDriver();
         }
-    }
 
-    private StateKey retrieveState() {
-        StateRepositoryFactory f = new StateRepositoryFactory();
-        StateRepository r = f.get(getApplicationContext());
-        return r.getKey();
+        statevector.propagate();
     }
 
     private void initializePassengerSelectDestination() {
@@ -242,8 +237,15 @@ public class MainScreenActivity extends LlevameActivity implements
     }
 
     private void initializePassengerSelectPath() {
-        moveToSelectPath();
-        loadState();
+        map.setOnMapClickListener(null);
+        Fragment target = new SelectPathFragment();
+        replaceStateFragment(target);
+    }
+
+    private void initializePassengerSelectDriver() {
+        map.setOnMapClickListener(null);
+        Fragment target = new SelectDriverFragment();
+        replaceStateFragment(target);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -259,39 +261,54 @@ public class MainScreenActivity extends LlevameActivity implements
         } else {
             destinationMarker.setPosition(destination);
         }
+        statevector.setDestination(destination);
+        statevector.persist(getApplicationContext());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSendSelectMessage(SendSelectMessage event) {
-        updateState(StateKey.PASSENGER_SELECT_PATH);
-        moveToSelectPath();
-    }
-
-    private void moveToSelectPath() {
-        map.setOnMapClickListener(null);
-        Fragment target = new SelectPathFragment();
-        replaceStateFragment(target);
+        statevector.setKey(StateKey.PASSENGER_SELECT_PATH);
+        statevector.persist(getApplicationContext());
+        initializePassengerSelectPath();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onCancelTripSetup(CancelTripSetup event) {
-        cleanRecords();
+        cleanState();
         initializeFragment();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onShowPath(ShowPath event) {
-        if (selectedPathPoly != null) {
-            selectedPathPoly.remove();
+        if (selectedPath != null) {
+            selectedPath.remove();
         }
-        selectedPath = event.getPath();
-        selectedPathPoly = selectedPath.addTo(map);
+        selectedPath = event.getPath().addTo(map);
+        statevector.setPath(event.getPath());
+        statevector.persist(getApplicationContext());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onConfirmPath(ConfirmPath event) {
-        updateState(StateKey.PASSENGER_SELECT_DRIVER);
-        // TODO: Load driver selection fragment and call replaceStateFragment.
+        statevector.setKey(StateKey.PASSENGER_SELECT_DRIVER);
+        statevector.persist(getApplicationContext());
+        initializePassengerSelectDriver();
+    }
+
+    @Subscribe
+    public void onSelectDriver(SelectDriver event) {
+        Driver driver = event.getDriver();
+        if (driverMarker == null) {
+            MarkerOptions options = new MarkerOptions();
+            options.icon(loadbmp(R.drawable.ic_directions_car_black_24dp));
+            options.anchor(0.5f, 0.5f);
+            options.position(driver.getLocation().toLatLng());
+            driverMarker = map.addMarker(options);
+        } else {
+            driverMarker.setPosition(driver.getLocation().toLatLng());
+        }
+        driverMarker.setTitle(driver.getProfile().getFullName());
+        driverMarker.showInfoWindow();
     }
 
     private void replaceStateFragment(Fragment target) {
@@ -305,57 +322,28 @@ public class MainScreenActivity extends LlevameActivity implements
         return loader.load(getApplicationContext(), vectorid);
     }
 
-    private void updateState(StateKey state) {
-        StateRepositoryFactory f = new StateRepositoryFactory();
-        StateRepository r = f.get(getApplicationContext());
+    private void cleanState() {
+        statevector.clear(getApplicationContext());
 
         if (locationMarker != null) {
-            r.saveOrigin(locationMarker.getPosition());
+            locationMarker.remove();
+            locationMarker = null;
         }
-        if (destinationMarker != null) {
-            r.saveDestination(destinationMarker.getPosition());
-        }
-        if (selectedPath != null) {
-            r.savePath(selectedPath);
-        }
-
-        r.save(state);
-    }
-
-    private void loadState() {
-        StateRepositoryFactory f = new StateRepositoryFactory();
-        StateRepository r = f.get(getApplicationContext());
-
-        LatLng destination = r.getDestination();
-        if (destination != null) {
-            UpdateDestination d = new UpdateDestination(destination);
-            onUpdateDestination(d);
-        }
-
-        Path path = r.getPath();
-        if (path != null) {
-            ShowPath showpath = new ShowPath(path);
-            onShowPath(showpath);
-        }
-    }
-
-    private void cleanRecords() {
-        cleanSavedState();
         if (destinationMarker != null) {
             destinationMarker.remove();
             destinationMarker = null;
         }
-        if (selectedPathPoly != null) {
-            selectedPathPoly.remove();
-            selectedPathPoly = null;
+        if (selectedPath != null) {
+            selectedPath.remove();
             selectedPath = null;
         }
-    }
+        if (driverMarker != null) {
+            driverMarker.remove();
+            driverMarker = null;
+        }
+        // TODO: Selected driver in state vector?
 
-    private void cleanSavedState() {
-        StateRepositoryFactory f = new StateRepositoryFactory();
-        StateRepository r = f.get(getApplicationContext());
-        r.clear();
+        initializeLocation();
     }
 
 }

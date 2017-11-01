@@ -64,10 +64,10 @@ public class LlevameEndpoint {
 
     protected <T> T get(
             String endpoint,
-            String requestBody,
+            String params,
             HttpHeaders headers,
             Class<T> responseType) {
-        return send(endpoint, requestBody, headers, responseType, HttpMethod.GET);
+        return send(endpoint + "?" + params, "", headers, responseType, HttpMethod.GET);
     }
 
     protected <T> T post(

@@ -23,34 +23,22 @@ public class PathRepository extends LlevameEndpoint {
     }
 
     public List<Path> query(String token, LatLng origin, LatLng destination) {
-        Request request = createRequest(origin, destination);
-        HttpHeaders headers = new HttpHeaderBuilder()
-                .forJson()
-                .withAuthToken(token)
-                .build();
+        // TODO Implement path query for this to work...
+        // Response r = getKey(ENDPOINT, toJson(request), headers, Response.class);
+        // return transformPaths(r.getPaths());
 
-        try {
-            // TODO Unmock this...
-            // Response r = getKey(ENDPOINT, toJson(request), headers, Response.class);
-            // return transformPaths(r.getPaths());
+        Path p1 = new Path();
+        p1.add(origin);
+        p1.add(destination);
 
-            Path p1 = new Path();
-            p1.add(origin);
-            p1.add(destination);
+        Path p2 = new Path();
+        p2.add(origin);
+        p2.add(destination);
 
-            Path p2 = new Path();
-            p2.add(origin);
-            p2.add(destination);
-
-            List<Path> l = new ArrayList<>();
-            l.add(p1);
-            l.add(p2);
-            return l;
-
-        } catch(Exception e) {
-            // TODO: See what to do here.
-            return null;
-        }
+        List<Path> l = new ArrayList<>();
+        l.add(p1);
+        l.add(p2);
+        return l;
     }
 
     private List<Path> transformPaths(List<List<Location>> paths) {

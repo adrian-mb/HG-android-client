@@ -97,6 +97,11 @@ public class Profile implements Serializable {
     }
 
     @JsonIgnore
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
+
+    @JsonIgnore
     public boolean isDriver() {
         return UserType.DRIVER.equals(type);
     }

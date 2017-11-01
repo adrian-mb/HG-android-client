@@ -23,7 +23,7 @@ import org.greenrobot.eventbus.EventBus;
 
 import hg.hg_android_client.R;
 import hg.hg_android_client.mainscreen.MainScreenActivity;
-import hg.hg_android_client.mainscreen.event.LocationUpdate;
+import hg.hg_android_client.mainscreen.event.UpdateLocation;
 
 public class TripService extends Service implements
         GoogleApiClient.ConnectionCallbacks,
@@ -51,7 +51,7 @@ public class TripService extends Service implements
 
     private void goForeground() {
         Notification notification = new NotificationCompat.Builder(getApplicationContext())
-                .setSmallIcon(android.R.drawable.sym_def_app_icon)
+                .setSmallIcon(R.drawable.ic_directions_car_black_24dp)
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText(getString(R.string.fg_notification_text))
                 .setContentIntent(launchIntent())
@@ -182,7 +182,7 @@ public class TripService extends Service implements
 
     @Override
     public void onLocationChanged(Location location) {
-        LocationUpdate update = new LocationUpdate(location);
+        UpdateLocation update = new UpdateLocation(location);
         EventBus.getDefault().post(update);
     }
 

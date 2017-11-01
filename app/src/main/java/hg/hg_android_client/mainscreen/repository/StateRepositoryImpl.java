@@ -39,24 +39,33 @@ public class StateRepositoryImpl implements StateRepository {
 
     @Override
     public void save(StateKey state) {
-        storage.edit().putString(KEY_STATE, state.name()).commit();
+        String name = state == null ? null : state.name();
+        storage.edit().putString(KEY_STATE, name).commit();
     }
 
     @Override
     public void saveOrigin(LatLng origin) {
-        Location location = new Location(origin.latitude, origin.longitude);
-        storage.edit().putString(KEY_ORIGIN, serialize(location)).commit();
+        String tosave = null;
+        if (origin != null) {
+            Location location = new Location(origin.latitude, origin.longitude);
+            tosave = serialize(location);
+        }
+        storage.edit().putString(KEY_ORIGIN, tosave).commit();
     }
 
     @Override
     public void saveDestination(LatLng destination) {
-        Location location = new Location(destination.latitude, destination.longitude);
-        storage.edit().putString(KEY_DESTINATION, serialize(location)).commit();
+        String tosave = null;
+        if (destination != null) {
+            Location location = new Location(destination.latitude, destination.longitude);
+            tosave = serialize(location);
+        }
+        storage.edit().putString(KEY_DESTINATION, tosave).commit();
     }
 
     @Override
     public void savePath(Path path) {
-        String json = path.toJson();
+        String json = path == null ? null : path.toJson();
         storage.edit().putString(KEY_PATH, json).commit();
     }
 

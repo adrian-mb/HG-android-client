@@ -78,6 +78,10 @@
             android:name=".mainscreen.select_path.PathFindingService"
             android:exported="false" />
 
+        <service
+            android:name=".mainscreen.select_driver.DriversQueryService"
+            android:exported="false" />
+
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version"/>

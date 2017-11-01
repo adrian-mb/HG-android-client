@@ -6,12 +6,11 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.greenrobot.eventbus.EventBus;
 
-import hg.hg_android_client.mainscreen.event.LocationUpdate;
+import hg.hg_android_client.mainscreen.event.UpdateLocation;
 import hg.hg_android_client.mainscreen.event.ShowPath;
 import hg.hg_android_client.mainscreen.event.UpdateDestination;
 import hg.hg_android_client.mainscreen.repository.StateRepository;
 import hg.hg_android_client.mainscreen.repository.StateRepositoryFactory;
-import hg.hg_android_client.mainscreen.select_path.Location;
 import hg.hg_android_client.mainscreen.select_path.Path;
 
 public class StateVector {
@@ -52,7 +51,23 @@ public class StateVector {
         this.path = path;
     }
 
+    public boolean isPassengerPickingDestination() {
+        return StateKey.PASSENGER_SELECT_DESTINATION.equals(key);
+    }
+
+    public boolean isPassengerPickingPath() {
+        return StateKey.PASSENGER_SELECT_PATH.equals(key);
+    }
+
+    public boolean isPassengerPickingDriver() {
+        return StateKey.PASSENGER_SELECT_DRIVER.equals(key);
+    }
+
     public void propagate() {
+        if (origin != null) {
+            UpdateLocation e = new UpdateLocation(origin);
+            EventBus.getDefault().post(e);
+        }
         if (destination != null) {
             UpdateDestination e = new UpdateDestination(destination);
             EventBus.getDefault().post(e);
@@ -69,6 +84,10 @@ public class StateVector {
         r.saveOrigin(origin);
         r.saveDestination(destination);
         r.savePath(path);
+    }
+
+    public void clear(Context context) {
+        new StateRepositoryFactory().get(context).clear();
     }
 
 }
