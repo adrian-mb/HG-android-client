@@ -3,7 +3,6 @@ package hg.hg_android_client.mainscreen.select_driver;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +12,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -23,6 +20,7 @@ import java.util.List;
 
 import hg.hg_android_client.R;
 import hg.hg_android_client.mainscreen.event.CancelTripSetup;
+import hg.hg_android_client.mainscreen.event.ConfirmDriver;
 import hg.hg_android_client.mainscreen.event.DriversAroundResponse;
 import hg.hg_android_client.mainscreen.event.SelectDriver;
 import hg.hg_android_client.mainscreen.repository.StateRepository;
@@ -63,9 +61,9 @@ public class SelectDriverFragment extends LlevameFragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (false) {
-                    // TODO: Test whether driver is selected
-                    // TODO: Post confirmation
+                if (selected != null) {
+                    ConfirmDriver confirmation = new ConfirmDriver(selected);
+                    EventBus.getDefault().post(confirmation);
                 } else {
                     String message = getString(R.string.please_select_driver);
                     Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();

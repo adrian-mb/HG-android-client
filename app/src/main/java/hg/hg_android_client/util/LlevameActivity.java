@@ -63,6 +63,19 @@ public class LlevameActivity extends AppCompatActivity {
         progressDialog = ProgressDialog.show(this, title, message);
     }
 
+    protected void showDialog(
+            String title,
+            String message,
+            DialogInterface.OnClickListener canceller) {
+        dismissDialog();
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setTitle(title);
+        progressDialog.setMessage(message);
+        progressDialog.setButton(-1, getString(R.string.button_cancel), canceller);
+        progressDialog.show();
+    }
+
     protected void dismissDialog() {
         if (progressDialog != null) {
             progressDialog.dismiss();

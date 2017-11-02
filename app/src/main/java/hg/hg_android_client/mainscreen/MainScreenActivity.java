@@ -1,6 +1,7 @@
 package hg.hg_android_client.mainscreen;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -25,6 +26,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import hg.hg_android_client.R;
 import hg.hg_android_client.mainscreen.event.CancelTripSetup;
+import hg.hg_android_client.mainscreen.event.ConfirmDriver;
 import hg.hg_android_client.mainscreen.event.ConfirmPath;
 import hg.hg_android_client.mainscreen.event.SelectDriver;
 import hg.hg_android_client.mainscreen.event.UpdateLocation;
@@ -204,6 +206,14 @@ public class MainScreenActivity extends LlevameActivity implements
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+        if (statevector != null && statevector.isPassengerWaitingConfirmation()) {
+            cancelDriverSelection();
+        }
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         if (map != null) {
@@ -246,6 +256,12 @@ public class MainScreenActivity extends LlevameActivity implements
         map.setOnMapClickListener(null);
         Fragment target = new SelectDriverFragment();
         replaceStateFragment(target);
+    }
+
+    private void replaceStateFragment(Fragment target) {
+        FragmentTransaction t = getSupportFragmentManager().beginTransaction();
+        t.replace(R.id.state_container, target);
+        t.commit();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -295,7 +311,7 @@ public class MainScreenActivity extends LlevameActivity implements
         initializePassengerSelectDriver();
     }
 
-    @Subscribe
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSelectDriver(SelectDriver event) {
         Driver driver = event.getDriver();
         if (driverMarker == null) {
@@ -311,10 +327,28 @@ public class MainScreenActivity extends LlevameActivity implements
         driverMarker.showInfoWindow();
     }
 
-    private void replaceStateFragment(Fragment target) {
-        FragmentTransaction t = getSupportFragmentManager().beginTransaction();
-        t.replace(R.id.state_container, target);
-        t.commit();
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onConfirmDriver(ConfirmDriver event) {
+        statevector.setKey(StateKey.PASSENGER_WAIT_FOR_TRIP_CONFIRMATION);
+        statevector.setDriver(event.getDriver());
+        String title = getString(R.string.waiting_driver_confirmation);
+        String message = getString(R.string.please_wait);; // TODO: Load these...
+        showDialog(title, message, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+                cancelDriverSelection();
+            }
+        });
+        // TODO: Send confirm push notification.
+        // TODO: Somehow, origin, destination and passenger name need to be sent too.
+    }
+
+    private void cancelDriverSelection() {
+        // TODO: Send cancel push notification.
+        // TODO: If driver does not answer, user will need to cancel.
+        statevector.setDriver(null);
+        statevector.setKey(StateKey.PASSENGER_SELECT_DRIVER);
+        dismissDialog();
     }
 
     private BitmapDescriptor loadbmp(int vectorid) {
@@ -341,7 +375,6 @@ public class MainScreenActivity extends LlevameActivity implements
             driverMarker.remove();
             driverMarker = null;
         }
-        // TODO: Selected driver in state vector?
 
         initializeLocation();
     }

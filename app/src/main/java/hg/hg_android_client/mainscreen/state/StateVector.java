@@ -11,6 +11,7 @@ import hg.hg_android_client.mainscreen.event.ShowPath;
 import hg.hg_android_client.mainscreen.event.UpdateDestination;
 import hg.hg_android_client.mainscreen.repository.StateRepository;
 import hg.hg_android_client.mainscreen.repository.StateRepositoryFactory;
+import hg.hg_android_client.mainscreen.select_driver.Driver;
 import hg.hg_android_client.mainscreen.select_path.Path;
 
 public class StateVector {
@@ -22,6 +23,8 @@ public class StateVector {
 
     private Path path;
 
+    private Driver driver;
+
     private StateVector() {
     }
 
@@ -32,6 +35,7 @@ public class StateVector {
         v.setOrigin(r.getOrigin());
         v.setDestination(r.getDestination());
         v.setPath(r.getPath());
+        v.setDriver(r.getDriver());
         return v;
     }
 
@@ -51,6 +55,10 @@ public class StateVector {
         this.path = path;
     }
 
+    public void setDriver(Driver driver) {
+        this.driver = driver;
+    }
+
     public boolean isPassengerPickingDestination() {
         return StateKey.PASSENGER_SELECT_DESTINATION.equals(key);
     }
@@ -61,6 +69,10 @@ public class StateVector {
 
     public boolean isPassengerPickingDriver() {
         return StateKey.PASSENGER_SELECT_DRIVER.equals(key);
+    }
+
+    public boolean isPassengerWaitingConfirmation() {
+        return StateKey.PASSENGER_WAIT_FOR_TRIP_CONFIRMATION.equals(key);
     }
 
     public void propagate() {
@@ -76,6 +88,8 @@ public class StateVector {
             ShowPath e = new ShowPath(path);
             EventBus.getDefault().post(e);
         }
+        // TODO: Propagate driver known somehow? May depend on state.
+        // May need to propagate driver confirmation or something...
     }
 
     public void persist(Context context) {

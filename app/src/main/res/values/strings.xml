@@ -97,4 +97,6 @@
     <string name="finding_drivers_title">Finding Drivers</string>
     <string name="please_wait">Please wait...</string>
 
+    <string name="waiting_driver_confirmation">Waiting for Driver\'s Confirmation</string>
+
 </resources>
