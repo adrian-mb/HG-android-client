@@ -82,7 +82,9 @@
 
     <string name="button_refresh">Refresh</string>
     <string name="button_confirm">Confirm</string>
+    <string name="button_decline">Decline</string>
     <string name="button_cancel">Cancel</string>
+    <string name="button_cancel_trip">Cancel Trip</string>
 
     <string name="please_select_path">Please select path first</string>
 
@@ -98,5 +100,17 @@
     <string name="please_wait">Please wait...</string>
 
     <string name="waiting_driver_confirmation">Waiting for Driver\'s Confirmation</string>
+
+    <string name="driver_idle_message">Waiting for an incoming trip request</string>
+
+    <string name="find_passenger">Find Passenger</string>
+    <string name="find_destination">Find Destination</string>
+
+    <string name="go_meet_passenger">Please go meet passenger</string>
+
+    <string name="about_to_cancel_trip">Cancel Trip</string>
+    <string name="are_you_sure">Are you sure?</string>
+
+    <string name="passenger_cancelled_trip">Trip cancelled by passenger</string>
 
 </resources>

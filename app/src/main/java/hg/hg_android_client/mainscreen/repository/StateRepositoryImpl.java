@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import hg.hg_android_client.mainscreen.driver_idle.Passenger;
 import hg.hg_android_client.mainscreen.select_driver.Driver;
 import hg.hg_android_client.mainscreen.state.StateKey;
 import hg.hg_android_client.mainscreen.select_path.Location;
@@ -25,6 +26,7 @@ public class StateRepositoryImpl implements StateRepository {
     private static final String KEY_PATH = "KEY_PATH";
 
     private static final String KEY_DRIVER = "KEY_DRIVER";
+    private static final String KEY_PASSENGER = "KEY_PASSENGER";
 
     private Profile profile;
     private SharedPreferences storage;
@@ -79,6 +81,12 @@ public class StateRepositoryImpl implements StateRepository {
     }
 
     @Override
+    public void savePassenger(Passenger passenger) {
+        String json = (passenger == null) ? null : serialize(passenger);
+        storage.edit().putString(KEY_PASSENGER, json).commit();
+    }
+
+    @Override
     public LatLng getOrigin() {
         return getLatLng(KEY_ORIGIN);
     }
@@ -104,6 +112,12 @@ public class StateRepositoryImpl implements StateRepository {
         return json == null ? null : deserialize(json, Driver.class);
     }
 
+    @Override
+    public Passenger getPassenger() {
+        String json = storage.getString(KEY_PASSENGER, null);
+        return json == null ? null : deserialize(json, Passenger.class);
+    }
+
     private LatLng getLatLng(String key) {
         if (storage.contains(key)) {
             String json = storage.getString(key, null);
@@ -122,6 +136,7 @@ public class StateRepositoryImpl implements StateRepository {
                 .remove(KEY_DESTINATION)
                 .remove(KEY_PATH)
                 .remove(KEY_DRIVER)
+                .remove(KEY_PASSENGER)
                 .commit();
     }
 

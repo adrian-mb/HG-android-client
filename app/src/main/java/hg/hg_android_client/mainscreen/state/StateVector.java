@@ -6,6 +6,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 import org.greenrobot.eventbus.EventBus;
 
+import hg.hg_android_client.mainscreen.driver_idle.Passenger;
+import hg.hg_android_client.mainscreen.event.LoadPassengerInfo;
 import hg.hg_android_client.mainscreen.event.UpdateLocation;
 import hg.hg_android_client.mainscreen.event.ShowPath;
 import hg.hg_android_client.mainscreen.event.UpdateDestination;
@@ -24,6 +26,7 @@ public class StateVector {
     private Path path;
 
     private Driver driver;
+    private Passenger passenger;
 
     private StateVector() {
     }
@@ -36,6 +39,7 @@ public class StateVector {
         v.setDestination(r.getDestination());
         v.setPath(r.getPath());
         v.setDriver(r.getDriver());
+        v.setPassenger(r.getPassenger());
         return v;
     }
 
@@ -59,6 +63,10 @@ public class StateVector {
         this.driver = driver;
     }
 
+    public void setPassenger(Passenger passenger) {
+        this.passenger = passenger;
+    }
+
     public boolean isPassengerPickingDestination() {
         return StateKey.PASSENGER_SELECT_DESTINATION.equals(key);
     }
@@ -75,6 +83,18 @@ public class StateVector {
         return StateKey.PASSENGER_WAIT_FOR_TRIP_CONFIRMATION.equals(key);
     }
 
+    public boolean isDriverWaitingTripRequest() {
+        return StateKey.DRIVER_WAIT_FOR_TRIP_REQUEST.equals(key);
+    }
+
+    public boolean isDriverEvaluatingTripRequest() {
+        return StateKey.DRIVER_CONFIRM_TRIP.equals(key);
+    }
+
+    public boolean isDriverMeetingPassenger() {
+        return StateKey.DRIVER_MEET_PASSENGER.equals(key);
+    }
+
     public void propagate() {
         if (origin != null) {
             UpdateLocation e = new UpdateLocation(origin);
@@ -88,8 +108,11 @@ public class StateVector {
             ShowPath e = new ShowPath(path);
             EventBus.getDefault().post(e);
         }
+        if (passenger != null && isDriverMeetingPassenger()) {
+            LoadPassengerInfo e = new LoadPassengerInfo(passenger);
+            EventBus.getDefault().post(e);
+        }
         // TODO: Propagate driver known somehow? May depend on state.
-        // May need to propagate driver confirmation or something...
     }
 
     public void persist(Context context) {
@@ -98,6 +121,8 @@ public class StateVector {
         r.saveOrigin(origin);
         r.saveDestination(destination);
         r.savePath(path);
+        r.saveDriver(driver);
+        r.savePassenger(passenger);
     }
 
     public void clear(Context context) {
