@@ -7,6 +7,7 @@ import com.google.android.gms.maps.model.LatLng;
 import org.greenrobot.eventbus.EventBus;
 
 import hg.hg_android_client.mainscreen.driver_idle.Passenger;
+import hg.hg_android_client.mainscreen.event.LoadDriverInfo;
 import hg.hg_android_client.mainscreen.event.LoadPassengerInfo;
 import hg.hg_android_client.mainscreen.event.UpdateLocation;
 import hg.hg_android_client.mainscreen.event.ShowPath;
@@ -95,6 +96,14 @@ public class StateVector {
         return StateKey.DRIVER_MEET_PASSENGER.equals(key);
     }
 
+    public boolean isPassengerWaitingForDriver() {
+        return StateKey.PASSENGER_WAIT_FOR_DRIVER.equals(key);
+    }
+
+    public boolean isOnTrip() {
+        return StateKey.ON_TRIP.equals(key);
+    }
+
     public void propagate() {
         if (origin != null) {
             UpdateLocation e = new UpdateLocation(origin);
@@ -112,7 +121,10 @@ public class StateVector {
             LoadPassengerInfo e = new LoadPassengerInfo(passenger);
             EventBus.getDefault().post(e);
         }
-        // TODO: Propagate driver known somehow? May depend on state.
+        if (driver != null && isPassengerWaitingForDriver()) {
+            LoadDriverInfo e = new LoadDriverInfo(driver);
+            EventBus.getDefault().post(e);
+        }
     }
 
     public void persist(Context context) {

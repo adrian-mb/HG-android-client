@@ -86,6 +86,12 @@
     <string name="button_cancel">Cancel</string>
     <string name="button_cancel_trip">Cancel Trip</string>
 
+    <string name="driver_go_meet">Passenger has been notified that their trip request was accepted; please go meet the passenger now.</string>
+    <string name="driver_warning">Important: Keep in mind that passenger will be charged from the moment they confirm being in the car; you will be notified once they do so.</string>
+
+    <string name="open_chat">Open Chat</string>
+    <string name="chat_window">Chat</string>
+
     <string name="please_select_path">Please select path first</string>
 
     <string name="finding_paths_title">Finding Paths</string>
@@ -112,5 +118,15 @@
     <string name="are_you_sure">Are you sure?</string>
 
     <string name="passenger_cancelled_trip">Trip cancelled by passenger</string>
+
+    <string name="im_in">I\'m in the Car</string>
+
+    <string name="finish_trip">Finish Trip</string>
+
+    <string name="driver_accepted">The driver has accepted your request and should be coming now to pick you up.
+    When you get into the car, please tap the button below to start the trip.</string>
+
+    <string name="about_to_start_trip">Start Trip</string>
+    <string name="about_to_start_trip_message">This will notify the driver so he can take you to your destination.</string>
 
 </resources>

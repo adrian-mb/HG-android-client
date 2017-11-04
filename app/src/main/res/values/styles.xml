@@ -21,6 +21,10 @@
         <item name="android:padding">16dp</item>
     </style>
 
+    <style name="SemiHalfPadded">
+        <item name="android:padding">12dp</item>
+    </style>
+
     <style name="HalfPadded">
         <item name="android:padding">8dp</item>
     </style>

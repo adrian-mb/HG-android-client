@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_alignParentTop="true"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/button_chat"
+            android:text="@string/open_chat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView style="@style/HalfPadded"
+            android:text="@string/driver_accepted"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/buttons"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/button_im_in"
+            android:text="@string/im_in"
+            android:backgroundTint="@android:color/holo_green_light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/button_cancel_trip"
+            android:text="@string/button_cancel_trip"
+            android:backgroundTint="@android:color/holo_red_light"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+</RelativeLayout>
