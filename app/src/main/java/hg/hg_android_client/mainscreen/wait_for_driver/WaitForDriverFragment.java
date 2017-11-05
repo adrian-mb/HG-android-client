@@ -13,8 +13,8 @@ import org.greenrobot.eventbus.EventBus;
 
 import hg.hg_android_client.R;
 import hg.hg_android_client.mainscreen.chat_client.ChatDialog;
-import hg.hg_android_client.mainscreen.event.CancelTrip;
-import hg.hg_android_client.mainscreen.event.GetInCar;
+import hg.hg_android_client.mainscreen.event.SendCancelTrip;
+import hg.hg_android_client.mainscreen.event.SendInCar;
 
 public class WaitForDriverFragment extends Fragment {
 
@@ -49,7 +49,7 @@ public class WaitForDriverFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int i) {
                         dialog.dismiss();
-                        EventBus.getDefault().post(new GetInCar());
+                        EventBus.getDefault().post(new SendInCar());
                     }
                 };
                 DialogInterface.OnClickListener cancel = new DialogInterface.OnClickListener() {
@@ -78,7 +78,7 @@ public class WaitForDriverFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int i) {
                         dialog.dismiss();
-                        EventBus.getDefault().post(new CancelTrip());
+                        EventBus.getDefault().post(new SendCancelTrip());
                     }
                 };
                 DialogInterface.OnClickListener cancel = new DialogInterface.OnClickListener() {

@@ -1,5 +1,6 @@
 package hg.hg_android_client.mainscreen.select_path;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.android.gms.maps.model.LatLng;
 
 public class Location {
@@ -20,10 +21,12 @@ public class Location {
         this.longitude = longitude;
     }
 
+    @JsonProperty("y")
     public double getLatitude() {
         return latitude;
     }
 
+    @JsonProperty("x")
     public double getLongitude() {
         return longitude;
     }

@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -23,32 +22,29 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 
-import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import hg.hg_android_client.R;
 import hg.hg_android_client.mainscreen.driver_confirm.DriverConfirmFragment;
 import hg.hg_android_client.mainscreen.driver_idle.DriverIdleFragment;
-import hg.hg_android_client.mainscreen.driver_idle.Passenger;
 import hg.hg_android_client.mainscreen.driver_meet_passenger.DriverMeetPassengerFragment;
-import hg.hg_android_client.mainscreen.event.CancelTrip;
+import hg.hg_android_client.mainscreen.event.ReceiveFinishTrip;
+import hg.hg_android_client.mainscreen.event.ReceiveInCar;
+import hg.hg_android_client.mainscreen.event.SendCancelTrip;
 import hg.hg_android_client.mainscreen.event.CancelTripSetup;
 import hg.hg_android_client.mainscreen.event.ConfirmDriver;
 import hg.hg_android_client.mainscreen.event.ConfirmPath;
 import hg.hg_android_client.mainscreen.event.ConfirmTrip;
 import hg.hg_android_client.mainscreen.event.DeclineTripRequest;
 import hg.hg_android_client.mainscreen.event.DriverTripConfirmation;
-import hg.hg_android_client.mainscreen.event.FinishTrip;
+import hg.hg_android_client.mainscreen.event.SendFinishTrip;
 import hg.hg_android_client.mainscreen.event.FocusOnDestination;
 import hg.hg_android_client.mainscreen.event.FocusOnPassenger;
-import hg.hg_android_client.mainscreen.event.GetInCar;
+import hg.hg_android_client.mainscreen.event.SendInCar;
 import hg.hg_android_client.mainscreen.event.LoadDriverInfo;
 import hg.hg_android_client.mainscreen.event.LoadPassengerInfo;
-import hg.hg_android_client.mainscreen.event.PassengerTripCancel;
+import hg.hg_android_client.mainscreen.event.ReceivedCancelTrip;
 import hg.hg_android_client.mainscreen.event.SelectDriver;
 import hg.hg_android_client.mainscreen.event.TripRequest;
 import hg.hg_android_client.mainscreen.event.UpdateLocation;
@@ -59,15 +55,11 @@ import hg.hg_android_client.mainscreen.on_trip.OnTripFragment;
 import hg.hg_android_client.mainscreen.select_destination.SelectDestinationFragment;
 import hg.hg_android_client.mainscreen.select_driver.Driver;
 import hg.hg_android_client.mainscreen.select_driver.SelectDriverFragment;
-import hg.hg_android_client.mainscreen.select_path.Location;
-import hg.hg_android_client.mainscreen.select_path.Path;
 import hg.hg_android_client.mainscreen.select_path.SelectPathFragment;
 import hg.hg_android_client.mainscreen.services.TripService;
 import hg.hg_android_client.mainscreen.state.StateKey;
 import hg.hg_android_client.mainscreen.state.StateVector;
 import hg.hg_android_client.mainscreen.wait_for_driver.WaitForDriverFragment;
-import hg.hg_android_client.model.Profile;
-import hg.hg_android_client.model.ProfileBuilder;
 import hg.hg_android_client.profile.ProfileActivity;
 import hg.hg_android_client.util.BitmapLoader;
 import hg.hg_android_client.util.LlevameActivity;
@@ -94,8 +86,6 @@ public class MainScreenActivity extends LlevameActivity implements
     private Polyline selectedPath;
 
     private StateVector statevector;
-
-    private long lastRequestId;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -282,34 +272,9 @@ public class MainScreenActivity extends LlevameActivity implements
     private void initializeDriverWaitingTripRequest() {
         Fragment f = new DriverIdleFragment();
         replaceStateFragment(f);
-        // TODO: Remove mock map click listener that emulates event arrival.
-        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                Profile p = new ProfileBuilder()
-                        .withFirstName("John")
-                        .withLastName("Petrucci")
-                        .withBirthdate("...")
-                        .withCountry("...")
-                        .withPassengerCharacter()
-                        .build();
-                Location origin = new Location(-34.8011, -58.4541);
-                Location destination = new Location(-34.8046, -58.4498);
-                Passenger pass = new Passenger();
-                pass.setLocation(origin);
-                pass.setProfile(p);
-                List<Location> l = new ArrayList<>();
-                l.add(origin);
-                l.add(destination);
-                Path path = new Path(l);
-                TripRequest r = new TripRequest(pass, destination, path);
-                EventBus.getDefault().post(r);
-            }
-        });
     }
 
-    private void initializeDriverConfirmation() {
-        lastRequestId = System.currentTimeMillis();
+    private void initializeDriverConfirmation(long lastRequestId) {
         Bundle args = new Bundle();
         args.putLong(DriverConfirmFragment.KEY_REQUEST_ID, lastRequestId);
         Fragment f = new DriverConfirmFragment();
@@ -336,14 +301,6 @@ public class MainScreenActivity extends LlevameActivity implements
     }
 
     private void initializeDriverMeetPassenger() {
-        // TODO: Remove map click listener that emulates event arrival
-        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                EventBus.getDefault().post(new GetInCar());
-            }
-        });
-
         DriverMeetPassengerFragment f = new DriverMeetPassengerFragment();
         replaceStateFragment(f);
     }
@@ -454,22 +411,13 @@ public class MainScreenActivity extends LlevameActivity implements
                 cancelDriverSelection();
             }
         });
-        // TODO: Send confirm push notification.
-        // TODO: Somehow, origin, destination and passenger name need to be sent too.
-
-        // TODO: Unmock this...
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                EventBus.getDefault().post(new DriverTripConfirmation());
-            }
-        }, 2000);
+        // TODO: Send confirm push notification, remember to generate request id.
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDriverTripConfirmation(DriverTripConfirmation event) {
-        if (statevector.isPassengerWaitingConfirmation()) {
+        long requestId = event.getRequestId();
+        if (statevector.isLastRequestId(event.getRequestId())) {
             statevector.setKey(StateKey.PASSENGER_WAIT_FOR_DRIVER);
             statevector.persist(getApplicationContext());
             dismissDialog();
@@ -490,7 +438,8 @@ public class MainScreenActivity extends LlevameActivity implements
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onTripRequest(TripRequest event) {
         if (statevector.isDriverWaitingTripRequest()) {
-            String passengerName = event.getPassenger().getProfile().getFullName();
+            statevector.setLastRequestId(event.getRequestId());
+            String passengerName = event.getPassenger().getName();
             LatLng passengerPosition = event.getPassenger().getLocation().toLatLng();
             LatLng passengerDestination = event.getDestination().toLatLng();
 
@@ -501,7 +450,7 @@ public class MainScreenActivity extends LlevameActivity implements
             updateDestinationMarker(passengerDestination);
             updatePassengerMarker(passengerPosition, passengerName);
             selectedPath = event.getSuggestedPath().addTo(map);
-            initializeDriverConfirmation();
+            initializeDriverConfirmation(event.getRequestId());
         } else {
             // TODO: What should we do in this case?
             // Send decline, or busy, or something?
@@ -510,7 +459,7 @@ public class MainScreenActivity extends LlevameActivity implements
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLoadPassengerInfo(LoadPassengerInfo event) {
-        String name = event.getPassenger().getProfile().getFullName();
+        String name = event.getPassenger().getName();
         LatLng position = event.getPassenger().getLocation().toLatLng();
         updatePassengerMarker(position, name);
     }
@@ -543,10 +492,17 @@ public class MainScreenActivity extends LlevameActivity implements
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDeclineTripRequest(DeclineTripRequest event) {
-        if (event.getRequestId() == lastRequestId) {
-            lastRequestId = -1;
-            declineTripRequest();
-            initializeFragment();
+        if (statevector.isLastRequestId(event.getRequestId())) {
+            statevector.clearLastRequestId();
+            if (statevector.isDriverEvaluatingTripRequest()) {
+                declineTripRequest();
+                initializeFragment();
+            } else if (statevector.isPassengerWaitingConfirmation()) {
+                String drivername = driverMarker.getTitle();
+                goBackOnPassengerWaitingState();
+                String message = String.format(getString(R.string.driver_declined), drivername);
+                displayToast(message);
+            }
         }
     }
 
@@ -555,10 +511,13 @@ public class MainScreenActivity extends LlevameActivity implements
         cleanState();
     }
 
+    private void displayToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onConfirmTripRequest(ConfirmTrip event) {
-        if (event.getRequestId() == lastRequestId) {
-            lastRequestId = -1;
+        if (statevector.isLastRequestId(event.getRequestId())) {
             // TODO: Send confirm notification.
             statevector.setKey(StateKey.DRIVER_MEET_PASSENGER);
             statevector.persist(getApplicationContext());
@@ -567,26 +526,40 @@ public class MainScreenActivity extends LlevameActivity implements
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onCancelTrip(CancelTrip event) {
+    public void onSendCancelTrip(SendCancelTrip event) {
         // TODO: Send cancel notification.
         if (statevector.isPassengerWaitingForDriver()) {
-            statevector.setKey(StateKey.PASSENGER_SELECT_DRIVER);
-            statevector.setDriver(null);
-            statevector.persist(getApplicationContext());
-            removeDriverMarker();
+            goBackOnPassengerWaitingState();
         } else if (statevector.isDriverMeetingPassenger()) {
             cleanState();
         }
         initializeFragment();
     }
 
+    private void goBackOnPassengerWaitingState() {
+        dismissDialog();
+        statevector.setKey(StateKey.PASSENGER_SELECT_DRIVER);
+        statevector.setDriver(null);
+        statevector.persist(getApplicationContext());
+        removeDriverMarker();
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onPassengerTripCancel(PassengerTripCancel event) {
-        // TODO: Use this for both cancel pre and post driver confirmation.
-        String message = getString(R.string.passenger_cancelled_trip);
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-        cleanState();
+    public void onReceivedCancelTrip(ReceivedCancelTrip event) {
+        String message = null;
+        if (statevector.isLastRequestId(event.getRequestId())) {
+            statevector.clearLastRequestId();
+            if (statevector.isPassengerWaitingForDriver()) {
+                String drivername = driverMarker.getTitle();
+                goBackOnPassengerWaitingState();
+                message = String.format(getString(R.string.driver_cancelled), drivername);
+            } else if (statevector.isDriverMeetingPassenger()) {
+                message = getString(R.string.passenger_cancelled_trip);
+                cleanState();
+            }
+        }
         initializeFragment();
+        displayToast(message);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -605,24 +578,39 @@ public class MainScreenActivity extends LlevameActivity implements
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onGetInCar(GetInCar event) {
+    public void onSendInCar(SendInCar event) {
         // TODO: Send notification to driver to start trip.
         // TODO: Send notification to server to start trip.
+        removeDriverMarker();
         statevector.setKey(StateKey.ON_TRIP);
         statevector.setDriver(null);
-        statevector.setPassenger(null);
-        removeDriverMarker();
-        removePassengerMarker();
         statevector.persist(getApplicationContext());
         initializeOnTrip();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onFinishTrip(FinishTrip event) {
+    public void onReceiveInCar(ReceiveInCar event) {
+        if (statevector.isLastRequestId(event.getRequestId())) {
+            statevector.setPassenger(null);
+            statevector.persist(getApplicationContext());
+            removePassengerMarker();
+            initializeOnTrip();
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onFinishTrip(SendFinishTrip event) {
         // TODO: Dunno; send finish trip to other guy; display stats.
         // If passenger, I may need to display payment screen;
         // If driver, I may need to display something else,
         // like a trip finished activity with earnings and a go back to beginning button.
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onReceiveFinishTrip(ReceiveFinishTrip event) {
+        if (statevector.isLastRequestId(event.getRequestId())) {
+            // TODO: Dunno, idem above.
+        }
     }
 
     private BitmapDescriptor loadbmp(int vectorid) {

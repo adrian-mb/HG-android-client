@@ -76,6 +76,10 @@ public class LlevameActivity extends AppCompatActivity {
         progressDialog.show();
     }
 
+    protected boolean isDialogShowing() {
+        return progressDialog != null && progressDialog.isShowing();
+    }
+
     protected void dismissDialog() {
         if (progressDialog != null) {
             progressDialog.dismiss();

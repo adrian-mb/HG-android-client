@@ -1,15 +1,7 @@
 package hg.hg_android_client.mainscreen.event;
 
-public class DeclineTripRequest {
-
+public class ReceiveFinishTrip {
     private long requestId;
-
-    public DeclineTripRequest() {
-    }
-
-    public DeclineTripRequest(long requestId) {
-        this.requestId = requestId;
-    }
 
     public long getRequestId() {
         return requestId;

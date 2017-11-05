@@ -1,4 +1,4 @@
 package hg.hg_android_client.mainscreen.event;
 
-public class GetInCar {
+public class SendFinishTrip {
 }

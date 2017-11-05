@@ -18,11 +18,15 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import hg.hg_android_client.R;
 import hg.hg_android_client.mainscreen.MainScreenActivity;
+import hg.hg_android_client.mainscreen.event.FirebaseTokenUpdate;
 import hg.hg_android_client.mainscreen.event.UpdateLocation;
 
 public class TripService extends Service implements
@@ -47,6 +51,7 @@ public class TripService extends Service implements
     public void onCreate() {
         goForeground();
         googleConnect();
+        checkFirebaseToken();
     }
 
     private void goForeground() {
@@ -87,6 +92,22 @@ public class TripService extends Service implements
                     .build();
         }
         apiclient.connect();
+    }
+
+    private void checkFirebaseToken() {
+        String token = FirebaseInstanceId.getInstance().getToken();
+        if (token != null) {
+            sendFirebaseToken(token);
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.POSTING)
+    public void onFirebaseTokenUpdate(FirebaseTokenUpdate event) {
+        sendFirebaseToken(event.getToken());
+    }
+
+    private void sendFirebaseToken(String token) {
+        // TODO: Implement; send update in bg thread or something.
     }
 
     @Override

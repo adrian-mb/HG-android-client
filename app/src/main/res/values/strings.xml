@@ -129,4 +129,7 @@
     <string name="about_to_start_trip">Start Trip</string>
     <string name="about_to_start_trip_message">This will notify the driver so he can take you to your destination.</string>
 
+    <string name="driver_declined">Driver %1$s declined trip request</string>
+    <string name="driver_cancelled">Driver %1$s cancelled trip</string>
+
 </resources>

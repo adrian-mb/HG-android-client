@@ -4,19 +4,28 @@ import hg.hg_android_client.mainscreen.select_path.Location;
 import hg.hg_android_client.model.Profile;
 
 public class Passenger {
-    private Profile profile;
+    private long userId;
+    private String name;
     private Location location;
 
-    public void setProfile(Profile profile) {
-        this.profile = profile;
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setLocation(Location location) {
         this.location = location;
     }
 
-    public Profile getProfile() {
-        return profile;
+    public long getUserId() {
+        return userId;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Location getLocation() {

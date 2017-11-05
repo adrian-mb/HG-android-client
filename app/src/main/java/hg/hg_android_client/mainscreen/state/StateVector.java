@@ -29,7 +29,10 @@ public class StateVector {
     private Driver driver;
     private Passenger passenger;
 
+    private long lastRequestId;
+
     private StateVector() {
+        this.lastRequestId = -1;
     }
 
     public static StateVector load(Context context) {
@@ -42,6 +45,18 @@ public class StateVector {
         v.setDriver(r.getDriver());
         v.setPassenger(r.getPassenger());
         return v;
+    }
+
+    public boolean isLastRequestId(long lastRequestId) {
+        return this.lastRequestId == lastRequestId;
+    }
+
+    public void clearLastRequestId() {
+        this.lastRequestId = -1;
+    }
+
+    public void setLastRequestId(long lastRequestId) {
+        this.lastRequestId = lastRequestId;
     }
 
     public void setKey(StateKey key) {
@@ -138,6 +153,7 @@ public class StateVector {
     }
 
     public void clear(Context context) {
+        setLastRequestId(-1);
         new StateRepositoryFactory().get(context).clear();
     }
 

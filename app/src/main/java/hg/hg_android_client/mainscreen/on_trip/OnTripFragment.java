@@ -12,7 +12,7 @@ import android.widget.Button;
 import org.greenrobot.eventbus.EventBus;
 
 import hg.hg_android_client.R;
-import hg.hg_android_client.mainscreen.event.FinishTrip;
+import hg.hg_android_client.mainscreen.event.SendFinishTrip;
 
 public class OnTripFragment extends Fragment {
 
@@ -32,7 +32,7 @@ public class OnTripFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int i) {
                         dialog.dismiss();
-                        EventBus.getDefault().post(new FinishTrip());
+                        EventBus.getDefault().post(new SendFinishTrip());
                     }
                 };
                 DialogInterface.OnClickListener cancel = new DialogInterface.OnClickListener() {

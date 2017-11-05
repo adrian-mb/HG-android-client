@@ -4,6 +4,7 @@ import hg.hg_android_client.mainscreen.select_path.Location;
 import hg.hg_android_client.model.Profile;
 
 public class Driver {
+    private long userId;
     private Profile profile;
     private Location location;
 
@@ -24,6 +25,14 @@ public class Driver {
 
     public Location getLocation() {
         return location;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
 }

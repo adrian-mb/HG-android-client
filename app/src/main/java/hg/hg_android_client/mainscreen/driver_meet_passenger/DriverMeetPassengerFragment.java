@@ -1,7 +1,6 @@
 package hg.hg_android_client.mainscreen.driver_meet_passenger;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -14,7 +13,7 @@ import org.greenrobot.eventbus.EventBus;
 
 import hg.hg_android_client.R;
 import hg.hg_android_client.mainscreen.chat_client.ChatDialog;
-import hg.hg_android_client.mainscreen.event.CancelTrip;
+import hg.hg_android_client.mainscreen.event.SendCancelTrip;
 
 public class DriverMeetPassengerFragment extends Fragment {
 
@@ -48,7 +47,7 @@ public class DriverMeetPassengerFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int i) {
                         dialog.dismiss();
-                        EventBus.getDefault().post(new CancelTrip());
+                        EventBus.getDefault().post(new SendCancelTrip());
                     }
                 };
                 DialogInterface.OnClickListener cancel = new DialogInterface.OnClickListener() {
