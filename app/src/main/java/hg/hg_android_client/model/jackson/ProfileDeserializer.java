@@ -29,6 +29,7 @@ public class ProfileDeserializer extends StdDeserializer<Profile> {
     private static final String KEY_CARS = "cars";
     private static final String KEY_MODEL = "model";
     private static final String KEY_PATENT = "patent";
+    private static final String KEY_CAR_ID = "id";
 
     public ProfileDeserializer() {
         this(null);
@@ -71,6 +72,7 @@ public class ProfileDeserializer extends StdDeserializer<Profile> {
         if (nodecars != null) {
             for (JsonNode carnode : nodecars) {
                 Car car = new Car(
+                        extractInteger(carnode, KEY_CAR_ID),
                         extract(carnode, KEY_PATENT),
                         extract(carnode, KEY_MODEL));
                 b.withAdditionalCar(car);
@@ -80,6 +82,11 @@ public class ProfileDeserializer extends StdDeserializer<Profile> {
 
     private void buildPassenger(ProfileBuilder builder, JsonNode node) {
         builder.withPassengerCharacter();
+    }
+
+    private Integer extractInteger(JsonNode node, String key) {
+        JsonNode n = node.get(key);
+        return n == null ? null : n.intValue();
     }
 
     private String extract(JsonNode node, String key) {

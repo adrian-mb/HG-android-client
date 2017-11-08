@@ -54,6 +54,11 @@ public class DriverProfileFragment extends Fragment {
         e.setText(value);
     }
 
+    public Integer getCarId() {
+        Car c = retrieveCarArgument();
+        return (c != null && c.getId() != null) ? c.getId() : null;
+    }
+
     public String getPatent() {
         return getComponentField(R.id.patent);
     }
@@ -69,7 +74,7 @@ public class DriverProfileFragment extends Fragment {
     }
 
     public Car getCar() {
-        return new Car(getPatent(), getCarModel());
+        return new Car(getCarId(), getPatent(), getCarModel());
     }
 
 }

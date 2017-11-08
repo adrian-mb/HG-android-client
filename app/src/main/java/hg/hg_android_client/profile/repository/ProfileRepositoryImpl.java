@@ -57,6 +57,7 @@ public class ProfileRepositoryImpl extends LlevameEndpoint implements ProfileRep
 
         try {
             Profile updated = post(ENDPOINT, request, headers, Profile.class);
+            cacheUser(updated);
             return updated;
         } catch (UnauthorizedAccessException e) {
             return null;
