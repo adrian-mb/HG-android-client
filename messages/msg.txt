@@ -1,0 +1,10 @@
+dXRpWwQqvm8:APA91bE3N_qTvKd07Y30U1FQdCYmiMTnn15IfiaPEyu0dHcTCKH_9VkJCJ9evGLl497P-nDI6BbA4fnC-w8TsubpNd7jGid3aaasXX5mpAMUZarnRvqBRCej9_19aA7OJWBVEHcYB8Fd
+
+type: PASSENGER_SELECT_DRIVER
+payload: {"requestId":-1,"passenger":{"userId":0,"name":"X","location":{"x":-58.3580,"y":-34.6166}},"destination":{"x":-58.3780,"y":-34.6366},"suggestedPath":[{"x":-58.3580,"y":-34.6166},{"x":-58.3780,"y":-34.6366}]}
+
+type: IN_CAR
+payload: {"requestId":-1}
+
+type: DRIVER_ACCEPT_TRIP
+payload: {"requestId":-1}

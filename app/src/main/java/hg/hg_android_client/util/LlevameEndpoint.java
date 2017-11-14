@@ -25,8 +25,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class LlevameEndpoint {
+
+    private static final String LOGGER_TAG = "LlevameEndpoint";
 
     private static final String CONFIGURATION_FILE = "endpoint.properties";
     private static final String KEY_BASE = "endpoint.base";
@@ -92,6 +96,14 @@ public class LlevameEndpoint {
 
         HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
 
+        Logger.getLogger(LOGGER_TAG).log(Level.INFO, new StringBuilder()
+                .append(method.toString())
+                .append(" ")
+                .append(endpoint)
+                .append(" ")
+                .append(requestBody)
+                .toString());
+
         ResponseEntity<T> response = template.exchange(
                 endpoint, method, request, responseType);
 
@@ -121,6 +133,8 @@ public class LlevameEndpoint {
 
         @Override
         public void handleError(ClientHttpResponse response) throws IOException {
+            Logger.getLogger(LOGGER_TAG).log(Level.SEVERE, response.getStatusText());
+
             if (HttpStatus.UNAUTHORIZED.equals(response.getStatusCode())) {
                 throw new UnauthorizedAccessException();
             }

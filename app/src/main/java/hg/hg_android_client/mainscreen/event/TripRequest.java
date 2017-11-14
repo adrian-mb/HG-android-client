@@ -8,7 +8,7 @@ public class TripRequest {
     private long requestId;
     private Passenger passenger;
     private Location destination;
-    private Path suggestedPath;
+    private Path path;
 
     public TripRequest() {
     }
@@ -16,7 +16,7 @@ public class TripRequest {
     public TripRequest(Passenger passenger, Location destination, Path suggestedPath) {
         this.passenger = passenger;
         this.destination = destination;
-        this.suggestedPath = suggestedPath;
+        this.path = suggestedPath;
     }
 
     public long getRequestId() {
@@ -31,8 +31,8 @@ public class TripRequest {
         return destination;
     }
 
-    public Path getSuggestedPath() {
-        return suggestedPath;
+    public Path getPath() {
+        return path;
     }
 
     public void setRequestId(long requestId) {
@@ -47,8 +47,8 @@ public class TripRequest {
         this.destination = destination;
     }
 
-    public void setSuggestedPath(Path path) {
-        this.suggestedPath = path;
+    public void setPath(Path path) {
+        this.path = path;
     }
 
 }

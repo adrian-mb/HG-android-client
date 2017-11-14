@@ -17,6 +17,7 @@ import hg.hg_android_client.login.intent.FacebookAuthenticationIntent;
 import hg.hg_android_client.login.intent.LoginIntent;
 import hg.hg_android_client.login.intent.LogoutIntent;
 import hg.hg_android_client.login.intent.RegistrationIntent;
+import hg.hg_android_client.login.repository.FacebookLoginEndpoint;
 import hg.hg_android_client.login.repository.LoginEndpoint;
 import hg.hg_android_client.login.repository.LoginEndpointFactory;
 import hg.hg_android_client.login.repository.RegistrationEndpoint;
@@ -64,14 +65,15 @@ public class IdentityService extends IntentService {
         String userId = intent.getStringExtra(FacebookAuthenticationIntent.KEY_USER_ID);
         String token  = intent.getStringExtra(FacebookAuthenticationIntent.KEY_TOKEN);
 
-        /*
-         * TODO: Facebook authentication.
-         * Send authentication event to application server;
-         * should create user if it does not exist.
-         */
+        FacebookLoginEndpoint r = new FacebookLoginEndpoint(getApplicationContext());
+        LoginEndpoint.Response response = r.login(token);
 
-        FacebookAuthSuccess e = new FacebookAuthSuccess(userId, token);
-        EventBus.getDefault().post(e);
+        if (response.isSuccess()) {
+            FacebookAuthSuccess e = new FacebookAuthSuccess(userId, response.getToken());
+            EventBus.getDefault().post(e);
+        } else {
+            // TODO: Handle
+        }
     }
 
     private void handleRegistration(Intent intent) {

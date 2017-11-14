@@ -55,8 +55,21 @@ public class DriversAroundRepository extends LlevameEndpoint {
         driverB.setProfile(profileB);
         driverB.setLocation(new Location(new LatLng(-34.8050, -58.4498)));
 
+        Profile profileC = new ProfileBuilder()
+                .withCountry("Argentina")
+                .withFirstName("Foo")
+                .withLastName("Bar")
+                .withDriverCharacter()
+                .withAdditionalCar(new Car("ABC133", "Fitito Rosa"))
+                .build();
+
+        Driver driverC = new Driver();
+        driverC.setProfile(profileC);
+        driverC.setLocation(new Location(-34.6176, -58.3680));
+
         drivers.add(driverA);
         drivers.add(driverB);
+        drivers.add(driverC);
 
         return drivers;
     }

@@ -446,10 +446,10 @@ public class MainScreenActivity extends LlevameActivity implements
             statevector.setKey(StateKey.DRIVER_CONFIRM_TRIP);
             statevector.setPassenger(event.getPassenger());
             statevector.setDestination(passengerDestination);
-            statevector.setPath(event.getSuggestedPath());
+            statevector.setPath(event.getPath());
             updateDestinationMarker(passengerDestination);
             updatePassengerMarker(passengerPosition, passengerName);
-            selectedPath = event.getSuggestedPath().addTo(map);
+            selectedPath = event.getPath().addTo(map);
             initializeDriverConfirmation(event.getRequestId());
         } else {
             // TODO: What should we do in this case?

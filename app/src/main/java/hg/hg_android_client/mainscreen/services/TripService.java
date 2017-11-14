@@ -24,6 +24,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import hg.hg_android_client.R;
 import hg.hg_android_client.mainscreen.MainScreenActivity;
 import hg.hg_android_client.mainscreen.event.FirebaseTokenUpdate;
@@ -33,6 +36,8 @@ public class TripService extends Service implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         LocationListener {
+
+    private static final String LOGGER_TAG = "TripService";
 
     private static final int SERVICE_ID = 1337;
 
@@ -97,6 +102,7 @@ public class TripService extends Service implements
     private void checkFirebaseToken() {
         String token = FirebaseInstanceId.getInstance().getToken();
         if (token != null) {
+            Logger.getLogger(LOGGER_TAG).log(Level.INFO, token);
             sendFirebaseToken(token);
         }
     }
