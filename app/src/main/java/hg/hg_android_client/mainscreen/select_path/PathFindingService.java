@@ -33,7 +33,8 @@ public class PathFindingService extends IntentService {
         LatLng origin = i.getOrigin();
         LatLng destination = i.getDestination();
 
-        PathRepository repository = new PathRepository(getApplicationContext());
+        PathRepositoryFactory f = new PathRepositoryFactory();
+        PathRepository repository = f.get(getApplicationContext());
         List<Path> retrieved = repository.query(token, origin, destination);
 
         if (retrieved != null) {

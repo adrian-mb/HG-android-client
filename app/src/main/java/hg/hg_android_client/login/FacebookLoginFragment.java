@@ -86,12 +86,6 @@ public class FacebookLoginFragment extends LlevameFragment
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onFacebookAuthSuccessEvent(FacebookAuthSuccess event) {
         EventBus.getDefault().post(new HideLoginProgress());
-
-        /*
-         * Do something with login results,
-         * then post a regular auth success event as if it was a regular login.
-         */
-
         EventBus.getDefault().post(new AuthSuccess(event.getToken()));
     }
 

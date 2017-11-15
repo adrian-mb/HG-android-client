@@ -5,8 +5,6 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.util.logging.Logger;
-
 import hg.hg_android_client.mainscreen.event.FirebaseTokenUpdate;
 
 public class TokenService extends FirebaseInstanceIdService {

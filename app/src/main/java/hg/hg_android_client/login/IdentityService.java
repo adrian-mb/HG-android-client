@@ -69,6 +69,7 @@ public class IdentityService extends IntentService {
         LoginEndpoint.Response response = r.login(token);
 
         if (response.isSuccess()) {
+            cacheToken(response.getToken());
             FacebookAuthSuccess e = new FacebookAuthSuccess(userId, response.getToken());
             EventBus.getDefault().post(e);
         } else {
