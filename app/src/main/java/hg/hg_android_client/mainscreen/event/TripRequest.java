@@ -17,6 +17,7 @@ public class TripRequest {
         this.passenger = passenger;
         this.destination = destination;
         this.path = suggestedPath;
+        this.requestId = System.currentTimeMillis();
     }
 
     public long getRequestId() {

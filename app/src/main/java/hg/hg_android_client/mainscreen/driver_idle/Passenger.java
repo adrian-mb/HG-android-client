@@ -8,6 +8,18 @@ public class Passenger {
     private String name;
     private Location location;
 
+    public static Passenger from(Profile profile, Location location) {
+        Long userId = profile.getUserId();
+        String name = profile.getFullName();
+
+        Passenger p = new Passenger();
+        p.setUserId(userId);
+        p.setName(name);
+        p.setLocation(location);
+
+        return p;
+    }
+
     public void setUserId(long userId) {
         this.userId = userId;
     }

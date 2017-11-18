@@ -83,6 +83,30 @@ public class StateVector {
         this.passenger = passenger;
     }
 
+    public LatLng getPosition() {
+        return origin;
+    }
+
+    public LatLng getDestination() {
+        return destination;
+    }
+
+    public Path getPath() {
+        return path;
+    }
+
+    public Long getLastRequestId() {
+        return lastRequestId;
+    }
+
+    public Passenger getPassenger() {
+        return passenger;
+    }
+
+    public Driver getDriver() {
+        return driver;
+    }
+
     public boolean isPassengerPickingDestination() {
         return StateKey.PASSENGER_SELECT_DESTINATION.equals(key);
     }

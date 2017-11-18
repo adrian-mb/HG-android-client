@@ -6,10 +6,15 @@ import android.content.SharedPreferences;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import hg.hg_android_client.model.Profile;
 import hg.hg_android_client.util.LlevameEndpoint;
 
 public class ProfileRepositoryImpl extends LlevameEndpoint implements ProfileRepository {
+
+    private static final String LOGGER_TAG = "ProfileRepository";
 
     private final String KEY_ENDPOINT = "endpoint.profile";
     private final String ENDPOINT;
@@ -45,6 +50,8 @@ public class ProfileRepositoryImpl extends LlevameEndpoint implements ProfileRep
     @Override
     public Profile retrieveCached() {
         String cachedJsonUser = storage.getString(KEY_PROFILE, "");
+        Logger.getLogger(LOGGER_TAG).log(Level.INFO,
+                "Retrieved cached profile: " + cachedJsonUser);
         return fromJson(cachedJsonUser, Profile.class);
     }
 

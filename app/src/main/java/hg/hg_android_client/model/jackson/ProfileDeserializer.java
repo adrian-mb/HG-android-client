@@ -17,6 +17,8 @@ import hg.hg_android_client.util.CommonUtil;
 
 public class ProfileDeserializer extends StdDeserializer<Profile> {
 
+    private static final String KEY_USER_ID = "userId";
+    private static final String KEY_USER_ID_ALT = "id";
     private static final String KEY_FIRST_NAME = "firstName";
     private static final String KEY_LAST_NAME = "lastName";
     private static final String KEY_COUNTRY = "country";
@@ -45,7 +47,16 @@ public class ProfileDeserializer extends StdDeserializer<Profile> {
 
         JsonNode node = jp.getCodec().readTree(jp);
 
+        Long userId = extractLong(node, KEY_USER_ID);
+        if (userId == null) {
+            userId = extractLong(node, KEY_USER_ID_ALT);
+        }
+        if (Integer.valueOf(0).equals(userId)) {
+            userId = null;
+        }
+
         ProfileBuilder builder = new ProfileBuilder()
+                .withUserId(userId)
                 .withFirstName(extract(node, KEY_FIRST_NAME))
                 .withLastName(extract(node, KEY_LAST_NAME))
                 .withCountry(extract(node, KEY_COUNTRY))
@@ -87,6 +98,11 @@ public class ProfileDeserializer extends StdDeserializer<Profile> {
     private Integer extractInteger(JsonNode node, String key) {
         JsonNode n = node.get(key);
         return n == null ? null : n.intValue();
+    }
+
+    private Long extractLong(JsonNode node, String key) {
+        JsonNode n = node.get(key);
+        return n == null ? null : n.longValue();
     }
 
     private String extract(JsonNode node, String key) {

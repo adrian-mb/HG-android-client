@@ -83,6 +83,10 @@
             android:exported="false" />
 
         <service
+            android:name=".firebase.MessageSenderService"
+            android:exported="false" />
+
+        <service
             android:name=".firebase.TokenService">
             <intent-filter>
                 <action android:name="com.google.firebase.INSTANCE_ID_EVENT"/>

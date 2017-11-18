@@ -125,8 +125,15 @@ public class IdentityService extends IntentService {
     }
 
     private void handleLogout(Intent intent) {
+        sendTokenDelete();
         cacheToken(null);
         EventBus.getDefault().post(new LogoutSuccess());
+    }
+
+    private void sendTokenDelete() {
+        TokenRepositoryFactory f = new TokenRepositoryFactory();
+        TokenRepository r = f.getRepository(getApplicationContext());
+        r.deleteToken();
     }
 
 }

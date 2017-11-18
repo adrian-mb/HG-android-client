@@ -6,4 +6,6 @@ public interface TokenRepository {
 
     void updateToken(String token);
 
+    void deleteToken();
+
 }

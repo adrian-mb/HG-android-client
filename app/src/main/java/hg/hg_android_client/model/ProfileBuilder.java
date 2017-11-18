@@ -8,6 +8,11 @@ public class ProfileBuilder {
         built = new Profile();
     }
 
+    public ProfileBuilder withUserId(Long userId) {
+        built.setUserId(userId);
+        return this;
+    }
+
     public ProfileBuilder withFirstName(String firstname) {
         built.setFirstName(firstname);
         return this;

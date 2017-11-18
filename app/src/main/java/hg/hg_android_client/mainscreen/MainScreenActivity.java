@@ -1,6 +1,7 @@
 package hg.hg_android_client.mainscreen;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -26,8 +27,11 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import hg.hg_android_client.R;
+import hg.hg_android_client.firebase.SendMessageIntent;
+import hg.hg_android_client.firebase.message.MessageType;
 import hg.hg_android_client.mainscreen.driver_confirm.DriverConfirmFragment;
 import hg.hg_android_client.mainscreen.driver_idle.DriverIdleFragment;
+import hg.hg_android_client.mainscreen.driver_idle.Passenger;
 import hg.hg_android_client.mainscreen.driver_meet_passenger.DriverMeetPassengerFragment;
 import hg.hg_android_client.mainscreen.event.ReceiveFinishTrip;
 import hg.hg_android_client.mainscreen.event.ReceiveInCar;
@@ -55,12 +59,17 @@ import hg.hg_android_client.mainscreen.on_trip.OnTripFragment;
 import hg.hg_android_client.mainscreen.select_destination.SelectDestinationFragment;
 import hg.hg_android_client.mainscreen.select_driver.Driver;
 import hg.hg_android_client.mainscreen.select_driver.SelectDriverFragment;
+import hg.hg_android_client.mainscreen.select_path.Location;
+import hg.hg_android_client.mainscreen.select_path.Path;
 import hg.hg_android_client.mainscreen.select_path.SelectPathFragment;
 import hg.hg_android_client.mainscreen.services.TripService;
 import hg.hg_android_client.mainscreen.state.StateKey;
 import hg.hg_android_client.mainscreen.state.StateVector;
 import hg.hg_android_client.mainscreen.wait_for_driver.WaitForDriverFragment;
+import hg.hg_android_client.model.Profile;
 import hg.hg_android_client.profile.ProfileActivity;
+import hg.hg_android_client.profile.repository.ProfileRepository;
+import hg.hg_android_client.profile.repository.ProfileRepositoryFactory;
 import hg.hg_android_client.util.BitmapLoader;
 import hg.hg_android_client.util.LlevameActivity;
 
@@ -411,7 +420,27 @@ public class MainScreenActivity extends LlevameActivity implements
                 cancelDriverSelection();
             }
         });
-        // TODO: Send confirm push notification, remember to generate request id.
+        sendDriverSelectedNotification(event);
+    }
+
+    private void sendDriverSelectedNotification(ConfirmDriver event) {
+        Context context = getApplicationContext();
+        MessageType type = MessageType.PASSENGER_SELECT_DRIVER;
+        Long target = event.getDriver().getUserId();
+        Location location = new Location(statevector.getPosition());
+        Location destination = new Location(statevector.getDestination());
+        Path path = statevector.getPath();
+        Passenger passenger = Passenger.from(getCachedProfile(), location);
+        TripRequest payload = new TripRequest(passenger, destination, path);
+        statevector.setLastRequestId(payload.getRequestId());
+        SendMessageIntent intent = new SendMessageIntent(context, target, type, payload);
+        startService(intent);
+    }
+
+    private Profile getCachedProfile() {
+        ProfileRepositoryFactory f = new ProfileRepositoryFactory();
+        ProfileRepository r = f.getRepository(getApplicationContext());
+        return r.retrieveCached();
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -428,8 +457,7 @@ public class MainScreenActivity extends LlevameActivity implements
     }
 
     private void cancelDriverSelection() {
-        // TODO: Send cancel push notification.
-        // TODO: If driver does not answer, user will need to cancel.
+        sendCancelTripNotification();
         statevector.setDriver(null);
         statevector.setKey(StateKey.PASSENGER_SELECT_DRIVER);
         dismissDialog();
@@ -439,6 +467,7 @@ public class MainScreenActivity extends LlevameActivity implements
     public void onTripRequest(TripRequest event) {
         if (statevector.isDriverWaitingTripRequest()) {
             statevector.setLastRequestId(event.getRequestId());
+            statevector.persist(getApplicationContext());
             String passengerName = event.getPassenger().getName();
             LatLng passengerPosition = event.getPassenger().getLocation().toLatLng();
             LatLng passengerDestination = event.getDestination().toLatLng();
@@ -493,9 +522,9 @@ public class MainScreenActivity extends LlevameActivity implements
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onDeclineTripRequest(DeclineTripRequest event) {
         if (statevector.isLastRequestId(event.getRequestId())) {
-            statevector.clearLastRequestId();
             if (statevector.isDriverEvaluatingTripRequest()) {
                 declineTripRequest();
+                statevector.clearLastRequestId();
                 initializeFragment();
             } else if (statevector.isPassengerWaitingConfirmation()) {
                 String drivername = driverMarker.getTitle();
@@ -507,8 +536,18 @@ public class MainScreenActivity extends LlevameActivity implements
     }
 
     private void declineTripRequest() {
-        // TODO: Send decline notification.
+        sendDeclineNotification();
         cleanState();
+    }
+
+    private void sendDeclineNotification() {
+        Context context = getApplicationContext();
+        MessageType type = MessageType.DRIVER_DECLINE_TRIP;
+        Passenger passenger = statevector.getPassenger();
+        Long target = passenger.getUserId();
+        DeclineTripRequest payload = new DeclineTripRequest(statevector.getLastRequestId());
+        SendMessageIntent intent = new SendMessageIntent(context, target, type, payload);
+        startService(intent);
     }
 
     private void displayToast(String message) {
@@ -518,22 +557,48 @@ public class MainScreenActivity extends LlevameActivity implements
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onConfirmTripRequest(ConfirmTrip event) {
         if (statevector.isLastRequestId(event.getRequestId())) {
-            // TODO: Send confirm notification.
             statevector.setKey(StateKey.DRIVER_MEET_PASSENGER);
             statevector.persist(getApplicationContext());
+            sendDriverConfirmationNotification();
             initializeDriverMeetPassenger();
         }
     }
 
+    private void sendDriverConfirmationNotification() {
+        Context context = getApplicationContext();
+        MessageType type = MessageType.DRIVER_ACCEPT_TRIP;
+        Passenger passenger = statevector.getPassenger();
+        Long target = passenger.getUserId();
+        ConfirmTrip payload = new ConfirmTrip(statevector.getLastRequestId());
+        SendMessageIntent intent = new SendMessageIntent(context, target, type, payload);
+        startService(intent);
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSendCancelTrip(SendCancelTrip event) {
-        // TODO: Send cancel notification.
+        sendCancelTripNotification();
         if (statevector.isPassengerWaitingForDriver()) {
             goBackOnPassengerWaitingState();
         } else if (statevector.isDriverMeetingPassenger()) {
             cleanState();
         }
         initializeFragment();
+    }
+
+    private void sendCancelTripNotification() {
+        Context context = getApplicationContext();
+        MessageType type = MessageType.CANCEL_TRIP;
+        Long target = null;
+        if (statevector.getPassenger() != null) {
+            Passenger passenger = statevector.getPassenger();
+            target = passenger.getUserId();
+        } else if (statevector.getDriver() != null) {
+            Driver driver = statevector.getDriver();
+            target = driver.getUserId();
+        }
+        ReceivedCancelTrip payload = new ReceivedCancelTrip(statevector.getLastRequestId());
+        SendMessageIntent intent = new SendMessageIntent(context, target, type, payload);
+        startService(intent);
     }
 
     private void goBackOnPassengerWaitingState() {
@@ -579,13 +644,22 @@ public class MainScreenActivity extends LlevameActivity implements
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSendInCar(SendInCar event) {
-        // TODO: Send notification to driver to start trip.
-        // TODO: Send notification to server to start trip.
+        sendInCarNotification();
         removeDriverMarker();
         statevector.setKey(StateKey.ON_TRIP);
         statevector.setDriver(null);
         statevector.persist(getApplicationContext());
         initializeOnTrip();
+    }
+
+    private void sendInCarNotification() {
+        Context context = getApplicationContext();
+        MessageType type = MessageType.IN_CAR;
+        Driver driver = statevector.getDriver();
+        Long target = driver.getUserId();
+        ReceiveInCar payload = new ReceiveInCar(statevector.getLastRequestId());
+        SendMessageIntent intent = new SendMessageIntent(context, target, type, payload);
+        startService(intent);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)

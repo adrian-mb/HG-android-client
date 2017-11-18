@@ -1,7 +1,7 @@
 package hg.hg_android_client.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.io.Serializable;
@@ -14,6 +14,7 @@ import hg.hg_android_client.util.CommonUtil;
 @JsonDeserialize(using = ProfileDeserializer.class)
 public class Profile implements Serializable {
 
+    private Long userId;
     private String firstName;
     private String lastName;
     private String country;
@@ -26,6 +27,10 @@ public class Profile implements Serializable {
 
     Profile() {
         this.cars = new ArrayList<>();
+    }
+
+    public Long getUserId() {
+        return userId;
     }
 
     public String getFirstName() {
@@ -50,6 +55,15 @@ public class Profile implements Serializable {
 
     public List<Car> getCars() {
         return cars;
+    }
+
+    @JsonSetter("id")
+    public void setId(Long id) {
+        this.setUserId(id);
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public void setFirstName(String firstname) {

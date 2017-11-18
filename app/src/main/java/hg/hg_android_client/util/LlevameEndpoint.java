@@ -66,6 +66,13 @@ public class LlevameEndpoint {
         return t.fromJson(json, objectType);
     }
 
+    protected <T> T delete(
+            String endpoint,
+            HttpHeaders headers,
+            Class<T> responseType) {
+        return send(endpoint, "", headers, responseType, HttpMethod.DELETE);
+    }
+
     protected <T> T get(
             String endpoint,
             String params,

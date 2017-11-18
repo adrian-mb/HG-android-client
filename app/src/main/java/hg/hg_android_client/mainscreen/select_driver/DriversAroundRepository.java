@@ -2,6 +2,7 @@ package hg.hg_android_client.mainscreen.select_driver;
 
 import android.content.Context;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.springframework.http.HttpHeaders;
@@ -13,6 +14,7 @@ import hg.hg_android_client.mainscreen.select_path.Location;
 import hg.hg_android_client.model.Car;
 import hg.hg_android_client.model.Profile;
 import hg.hg_android_client.model.ProfileBuilder;
+import hg.hg_android_client.util.JsonTransform;
 import hg.hg_android_client.util.LlevameEndpoint;
 
 public class DriversAroundRepository extends LlevameEndpoint {
@@ -26,52 +28,21 @@ public class DriversAroundRepository extends LlevameEndpoint {
         ENDPOINT = getEndpoint(KEY_ENDPOINT);
     }
 
-    public List<Driver> query(String token, Location location) {
-        // TODO: Implement drivers query for it to work...
-
-        List<Driver> drivers = new ArrayList<>();
-
-        Profile profileA = new ProfileBuilder()
-                .withCountry("Argentina")
-                .withFirstName("Pity")
-                .withLastName("Alvarez")
-                .withDriverCharacter()
-                .withAdditionalCar(new Car("ABC111", "Fiat Palio Rojo"))
+    public List<Driver> query(String token) {
+        HttpHeaders headers = new HttpHeaderBuilder()
+                .forJson()
+                .withAuthToken(token)
                 .build();
 
-        Driver driverA = new Driver();
-        driverA.setProfile(profileA);
-        driverA.setLocation(new Location(new LatLng(-34.8034, -58.4490)));
+        try {
+            String response = get(ENDPOINT, "", headers, String.class);
+            TypeReference<List<Driver>> r = new TypeReference<List<Driver>>() {};
+            JsonTransform t = new JsonTransform();
+            return t.fromJson(response, r);
+        } catch (Exception e) {
+            return new ArrayList<>();
+        }
 
-        Profile profileB = new ProfileBuilder()
-                .withCountry("Argentina")
-                .withFirstName("Pato")
-                .withLastName("Fontanet")
-                .withDriverCharacter()
-                .withAdditionalCar(new Car("ABC123", "Ford Focus Blanco"))
-                .build();
-
-        Driver driverB = new Driver();
-        driverB.setProfile(profileB);
-        driverB.setLocation(new Location(new LatLng(-34.8050, -58.4498)));
-
-        Profile profileC = new ProfileBuilder()
-                .withCountry("Argentina")
-                .withFirstName("Foo")
-                .withLastName("Bar")
-                .withDriverCharacter()
-                .withAdditionalCar(new Car("ABC133", "Fitito Rosa"))
-                .build();
-
-        Driver driverC = new Driver();
-        driverC.setProfile(profileC);
-        driverC.setLocation(new Location(-34.6176, -58.3680));
-
-        drivers.add(driverA);
-        drivers.add(driverB);
-        drivers.add(driverC);
-
-        return drivers;
     }
 
     private static final class Request {

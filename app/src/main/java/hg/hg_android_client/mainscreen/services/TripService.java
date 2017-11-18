@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
@@ -28,6 +29,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import hg.hg_android_client.R;
+import hg.hg_android_client.firebase.MessagingEndpoint;
+import hg.hg_android_client.login.repository.TokenRepository;
+import hg.hg_android_client.login.repository.TokenRepositoryFactory;
 import hg.hg_android_client.mainscreen.MainScreenActivity;
 import hg.hg_android_client.mainscreen.event.FirebaseTokenUpdate;
 import hg.hg_android_client.mainscreen.event.UpdateLocation;
@@ -112,8 +116,22 @@ public class TripService extends Service implements
         sendFirebaseToken(event.getToken());
     }
 
-    private void sendFirebaseToken(String token) {
-        // TODO: Implement; send update in bg thread or something.
+    private void sendFirebaseToken(final String token) {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                MessagingEndpoint endpoint =
+                        new MessagingEndpoint(getApplicationContext());
+                endpoint.updateToken(getAuthToken(), token);
+                return null;
+            }
+        }.execute();
+    }
+
+    private String getAuthToken() {
+        TokenRepositoryFactory f = new TokenRepositoryFactory();
+        TokenRepository r = f.getRepository(getApplicationContext());
+        return r.getToken();
     }
 
     @Override
@@ -210,7 +228,27 @@ public class TripService extends Service implements
     @Override
     public void onLocationChanged(Location location) {
         UpdateLocation update = new UpdateLocation(location);
+        sendUpdatePosition(location);
         EventBus.getDefault().post(update);
+    }
+
+    private void sendUpdatePosition(Location location) {
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+
+        final hg.hg_android_client.mainscreen.select_path.Location loc =
+                new hg.hg_android_client.mainscreen.select_path.Location(
+                        latitude, longitude);
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                PositionUpdateEndpoint endpoint =
+                        new PositionUpdateEndpoint(getApplicationContext());
+                endpoint.updateLocation(getAuthToken(), loc);
+                return null;
+            }
+        }.execute();
     }
 
 }

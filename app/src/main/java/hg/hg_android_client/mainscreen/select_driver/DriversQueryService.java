@@ -33,7 +33,7 @@ public class DriversQueryService extends IntentService {
         Location location = i.getLocation();
 
         DriversAroundRepository repository = new DriversAroundRepository(getApplicationContext());
-        List<Driver> retrieved = repository.query(token, location);
+        List<Driver> retrieved = repository.query(token);
 
         if (retrieved != null) {
             DriversAroundResponse event = new DriversAroundResponse(retrieved);

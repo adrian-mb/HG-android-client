@@ -10,7 +10,7 @@ public class TokenRepositoryFactory {
     public TokenRepository getRepository(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(
                 KEY_TOKEN_PREFERENCES, Context.MODE_PRIVATE);
-        return new SharedPreferencesTokenRepository(preferences);
+        return new TokenRepositoryImpl(context, preferences);
     }
 
 }
