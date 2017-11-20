@@ -54,14 +54,21 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/chat_body"
+    <ScrollView
+        android:id="@+id/scrollbar"
         android:layout_above="@id/controls"
         android:layout_below="@id/header"
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/chat_body"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </RelativeLayout>

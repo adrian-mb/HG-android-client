@@ -6,5 +6,6 @@ public enum MessageType {
     DRIVER_DECLINE_TRIP,
     CANCEL_TRIP,
     IN_CAR,
-    FINISH_TRIP
+    FINISH_TRIP,
+    CHAT_MESSAGE
 }

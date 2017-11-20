@@ -8,6 +8,8 @@ import org.greenrobot.eventbus.EventBus;
 import java.util.Map;
 
 import hg.hg_android_client.firebase.message.MessageType;
+import hg.hg_android_client.mainscreen.chat_client.ChatMessage;
+import hg.hg_android_client.mainscreen.chat_client.ChatMessageRepository;
 import hg.hg_android_client.mainscreen.event.DeclineTripRequest;
 import hg.hg_android_client.mainscreen.event.DriverTripConfirmation;
 import hg.hg_android_client.mainscreen.event.ReceiveFinishTrip;
@@ -49,6 +51,12 @@ public class MessagingService extends FirebaseMessagingService {
                 break;
             case FINISH_TRIP:
                 EventBus.getDefault().post(fromJson(payload, ReceiveFinishTrip.class));
+                break;
+            case CHAT_MESSAGE:
+                ChatMessage message = fromJson(payload, ChatMessage.class);
+                ChatMessageRepository r = new ChatMessageRepository(getApplicationContext());
+                r.receive(message);
+                EventBus.getDefault().post(message);
                 break;
         }
     }
