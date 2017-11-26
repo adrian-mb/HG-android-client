@@ -1,8 +1,13 @@
 package hg.hg_android_client.mainscreen.chat_client;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 final class ChatCommunicate {
     private boolean received;
     private ChatMessage message;
+
+    public ChatCommunicate() {
+    }
 
     private ChatCommunicate(ChatMessage message, boolean received) {
         this.message = message;
@@ -17,10 +22,16 @@ final class ChatCommunicate {
         return new ChatCommunicate(message, false);
     }
 
-    public String getMessage() {
+    public ChatMessage getMessage() {
+        return message;
+    }
+
+    @JsonIgnore
+    public String getTextMessage() {
         return message.getMessage();
     }
 
+    @JsonIgnore
     public String getSender() {
         return message.getSenderName();
     }

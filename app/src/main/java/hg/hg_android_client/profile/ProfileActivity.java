@@ -20,6 +20,7 @@ import hg.hg_android_client.login.repository.TokenRepository;
 import hg.hg_android_client.login.repository.TokenRepositoryFactory;
 import hg.hg_android_client.mainscreen.MainScreenActivity;
 import hg.hg_android_client.model.Car;
+import hg.hg_android_client.model.CreditCard;
 import hg.hg_android_client.model.Profile;
 import hg.hg_android_client.model.ProfileBuilder;
 import hg.hg_android_client.profile.event.UpdateSuccess;
@@ -188,7 +189,8 @@ public class ProfileActivity extends LlevameActivity {
             Car car = ((DriverProfileFragment) fragment).getCar();
             builder.withDriverCharacter().withAdditionalCar(car);
         } else if (selectedId == R.id.radio_passenger) {
-            builder.withPassengerCharacter();
+            CreditCard creditCard = ((PassengerProfileFragment) fragment).getCreditCard();
+            builder.withPassengerCharacter().withCreditCard(creditCard);
         }
 
         return builder.build();

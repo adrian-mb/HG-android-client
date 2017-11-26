@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -29,6 +30,9 @@ import org.greenrobot.eventbus.ThreadMode;
 import hg.hg_android_client.R;
 import hg.hg_android_client.firebase.SendMessageIntent;
 import hg.hg_android_client.firebase.message.MessageType;
+import hg.hg_android_client.login.repository.TokenRepository;
+import hg.hg_android_client.login.repository.TokenRepositoryFactory;
+import hg.hg_android_client.mainscreen.chat_client.ChatMessageRepository;
 import hg.hg_android_client.mainscreen.driver_confirm.DriverConfirmFragment;
 import hg.hg_android_client.mainscreen.driver_idle.DriverIdleFragment;
 import hg.hg_android_client.mainscreen.driver_idle.Passenger;
@@ -56,6 +60,7 @@ import hg.hg_android_client.mainscreen.event.SendSelectMessage;
 import hg.hg_android_client.mainscreen.event.ShowPath;
 import hg.hg_android_client.mainscreen.event.UpdateDestination;
 import hg.hg_android_client.mainscreen.on_trip.OnTripFragment;
+import hg.hg_android_client.mainscreen.on_trip.TripRepository;
 import hg.hg_android_client.mainscreen.select_destination.SelectDestinationFragment;
 import hg.hg_android_client.mainscreen.select_driver.Driver;
 import hg.hg_android_client.mainscreen.select_driver.SelectDriverFragment;
@@ -319,6 +324,11 @@ public class MainScreenActivity extends LlevameActivity implements
         replaceStateFragment(f);
     }
 
+    private void cleanChatLog() {
+        ChatMessageRepository r = new ChatMessageRepository(getApplicationContext());
+        r.clean();
+    }
+
     private void initializeOnTrip() {
         Fragment f = new OnTripFragment();
         replaceStateFragment(f);
@@ -450,6 +460,7 @@ public class MainScreenActivity extends LlevameActivity implements
             statevector.setKey(StateKey.PASSENGER_WAIT_FOR_DRIVER);
             statevector.persist(getApplicationContext());
             dismissDialog();
+            cleanChatLog();
             initializePassengerWaitForDriver();
         } else {
             // TODO: Send cancel or something.
@@ -560,8 +571,59 @@ public class MainScreenActivity extends LlevameActivity implements
             statevector.setKey(StateKey.DRIVER_MEET_PASSENGER);
             statevector.persist(getApplicationContext());
             sendDriverConfirmationNotification();
+            sendStartTrip();
+            cleanChatLog();
             initializeDriverMeetPassenger();
         }
+    }
+
+    public void sendStartTrip() {
+        // TODO: Create a service or something...
+        new AsyncTask<StateVector, Void, Void>() {
+            @Override
+            protected Void doInBackground(StateVector... args) {
+                StateVector v = args[0];
+
+                String token = retrieveAuthToken();
+
+                Passenger passenger = v.getPassenger();
+                Long passengerId = passenger.getUserId();
+                Location origin = passenger.getLocation();
+                Location destination = new Location(v.getDestination());
+
+                TripRepository repo = new TripRepository(getApplicationContext());
+                repo.startTrip(token, origin, destination, passengerId);
+                return null;
+            }
+        }.execute(statevector);
+    }
+
+    public void cancelTrip() {
+        new AsyncTask<Void,Void,Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                TripRepository repo = new TripRepository(getApplicationContext());
+                repo.cancelTrip(retrieveAuthToken());
+                return null;
+            }
+        }.execute();
+    }
+
+    public void finishTrip() {
+        new AsyncTask<Void,Void,Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                TripRepository repo = new TripRepository(getApplicationContext());
+                repo.endTrip(retrieveAuthToken());
+                return null;
+            }
+        }.execute();
+    }
+
+    private String retrieveAuthToken() {
+        TokenRepositoryFactory f = new TokenRepositoryFactory();
+        TokenRepository r = f.getRepository(getApplicationContext());
+        return r.getToken();
     }
 
     private void sendDriverConfirmationNotification() {
@@ -582,6 +644,7 @@ public class MainScreenActivity extends LlevameActivity implements
         } else if (statevector.isDriverMeetingPassenger()) {
             cleanState();
         }
+        cancelTrip();
         initializeFragment();
     }
 
@@ -649,7 +712,19 @@ public class MainScreenActivity extends LlevameActivity implements
         statevector.setKey(StateKey.ON_TRIP);
         statevector.setDriver(null);
         statevector.persist(getApplicationContext());
+        sendInCarToServer();
         initializeOnTrip();
+    }
+
+    private void sendInCarToServer() {
+        new AsyncTask<Void,Void,Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                TripRepository repo = new TripRepository(getApplicationContext());
+                repo.notifyInCar(retrieveAuthToken());
+                return null;
+            }
+        }.execute();
     }
 
     private void sendInCarNotification() {
@@ -673,18 +748,38 @@ public class MainScreenActivity extends LlevameActivity implements
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onFinishTrip(SendFinishTrip event) {
-        // TODO: Dunno; send finish trip to other guy; display stats.
-        // If passenger, I may need to display payment screen;
-        // If driver, I may need to display something else,
-        // like a trip finished activity with earnings and a go back to beginning button.
+    public void onSendFinishTrip(SendFinishTrip event) {
+        event.setRequestId(statevector.getLastRequestId());
+        finishTrip();
+        // TODO: Actual notification response will come from server!
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onReceiveFinishTrip(ReceiveFinishTrip event) {
-        if (statevector.isLastRequestId(event.getRequestId())) {
-            // TODO: Dunno, idem above.
+        ProfileRepositoryFactory f = new ProfileRepositoryFactory();
+        ProfileRepository r = f.getRepository(getApplicationContext());
+        Profile p = r.retrieveCached();
+
+        String title = "Trip Finished";
+        String message = "";
+
+        String cost = event.getCostString();
+
+        if (p.isPassenger()) {
+            message = cost + " will be debited from your credit card.";
+        } else if (p.isDriver()) {
+            message = cost + " has been charged to the passenger and added to your balance.";
         }
+
+        displayConfirmationDialog(title, message, "OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int i) {
+                dialog.dismiss();
+            }
+        });
+
+        cleanState();
+        initializeFragment();
     }
 
     private BitmapDescriptor loadbmp(int vectorid) {
@@ -709,6 +804,8 @@ public class MainScreenActivity extends LlevameActivity implements
         }
         removePassengerMarker();
         removeDriverMarker();
+
+        cleanChatLog();
 
         initializeLocation();
     }

@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class PassengerSpecifics implements ProfileSpecifics, Serializable {
 
-    Profile parent;
+    private Profile parent;
 
     public PassengerSpecifics(Profile parent) {
         this.parent = parent;
@@ -12,7 +12,8 @@ public class PassengerSpecifics implements ProfileSpecifics, Serializable {
 
     @Override
     public boolean detailsComplete() {
-        return true;
+        CreditCard creditCard = parent.getCreditCard();
+        return creditCard != null && creditCard.isComplete();
     }
 
 }

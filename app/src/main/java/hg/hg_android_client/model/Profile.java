@@ -22,6 +22,7 @@ public class Profile implements Serializable {
     private UserType type;
 
     private List<Car> cars;
+    private CreditCard creditCard;
 
     private ProfileSpecifics specifics;
 
@@ -55,6 +56,10 @@ public class Profile implements Serializable {
 
     public List<Car> getCars() {
         return cars;
+    }
+
+    public CreditCard getCreditCard() {
+        return creditCard;
     }
 
     @JsonSetter("id")
@@ -108,6 +113,10 @@ public class Profile implements Serializable {
 
     public void setCars(List<Car> cars) {
         this.cars = cars;
+    }
+
+    public void setCreditCard(CreditCard creditCard) {
+        this.creditCard = creditCard;
     }
 
     @JsonIgnore

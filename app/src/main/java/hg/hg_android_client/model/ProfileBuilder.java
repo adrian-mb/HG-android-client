@@ -62,6 +62,11 @@ public class ProfileBuilder {
 
     public class PassengerProfileBuilder {
 
+        public PassengerProfileBuilder withCreditCard(CreditCard creditCard) {
+            built.setCreditCard(creditCard);
+            return this;
+        }
+
         public Profile build() {
             return ProfileBuilder.this.build();
         }

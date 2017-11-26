@@ -4,9 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.view.Gravity;
 import android.view.View;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -107,7 +105,7 @@ public class ChatDialog extends Dialog {
             view = getLayoutInflater().inflate(R.layout.message_sent, chatBody, false);
         }
         ((TextView) view.findViewById(R.id.sender)).setText(communicate.getSender());
-        ((TextView) view.findViewById(R.id.message)).setText(communicate.getMessage());
+        ((TextView) view.findViewById(R.id.message)).setText(communicate.getTextMessage());
         chatBody.addView(view);
         scrollBottom();
     }

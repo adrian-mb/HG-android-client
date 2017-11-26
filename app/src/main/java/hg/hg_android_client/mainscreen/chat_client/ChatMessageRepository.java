@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import hg.hg_android_client.firebase.SendMessageIntent;
@@ -28,6 +27,10 @@ public class ChatMessageRepository {
         this.preferences = context.getSharedPreferences(KEY_CHAT, Context.MODE_PRIVATE);
     }
 
+    public void clean() {
+        preferences.edit().remove(KEY_MESSAGE_LIST).commit();
+    }
+
     public void receive(ChatMessage message) {
         List<ChatCommunicate> sequence = retrieveMessages();
         sequence.add(ChatCommunicate.received(message));
@@ -45,6 +48,7 @@ public class ChatMessageRepository {
         MessageType type = MessageType.CHAT_MESSAGE;
         Long to = retrieveMessageTarget(context);
         SendMessageIntent i = new SendMessageIntent(context, to, type, message);
+        context.startService(i);
     }
 
     private Long retrieveMessageTarget(Context context) {
@@ -63,22 +67,9 @@ public class ChatMessageRepository {
     }
 
     public List<ChatCommunicate> retrieveMessages() {
-//        String raw = preferences.getString(KEY_MESSAGE_LIST, "[]");
-//        JsonTransform t = new JsonTransform();
-//        return t.fromJson(raw, new TypeReference<List<ChatCommunicate>>(){});
-        // TODO: Unmock this
-
-        ChatMessage m1 = new ChatMessage("Bob", "Hey");
-        ChatCommunicate c1 = ChatCommunicate.received(m1);
-
-        ChatMessage m2 = new ChatMessage("Mik", "Sup");
-        ChatCommunicate c2 = ChatCommunicate.sent(m2);
-
-        List<ChatCommunicate> l = new ArrayList<>();
-        l.add(c1);
-        l.add(c2);
-
-        return l;
+        String raw = preferences.getString(KEY_MESSAGE_LIST, "[]");
+        JsonTransform t = new JsonTransform();
+        return t.fromJson(raw, new TypeReference<List<ChatCommunicate>>(){});
     }
 
     private void persist(List<ChatCommunicate> sequence) {
