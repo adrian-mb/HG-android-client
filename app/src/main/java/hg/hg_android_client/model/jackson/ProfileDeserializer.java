@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.List;
 
 import hg.hg_android_client.model.Car;
+import hg.hg_android_client.model.CreditCard;
 import hg.hg_android_client.model.Profile;
 import hg.hg_android_client.model.ProfileBuilder;
 import hg.hg_android_client.util.CommonUtil;
@@ -32,6 +33,11 @@ public class ProfileDeserializer extends StdDeserializer<Profile> {
     private static final String KEY_MODEL = "model";
     private static final String KEY_PATENT = "patent";
     private static final String KEY_CAR_ID = "id";
+
+    private static final String KEY_CREDIT_CARD = "card";
+    private static final String KEY_CREDIT_CARD_NUMBER = "number";
+    private static final String KEY_CVC = "cvc";
+    private static final String KEY_EXPIRATION = "expirationDate";
 
     public ProfileDeserializer() {
         this(null);
@@ -92,7 +98,18 @@ public class ProfileDeserializer extends StdDeserializer<Profile> {
     }
 
     private void buildPassenger(ProfileBuilder builder, JsonNode node) {
-        builder.withPassengerCharacter();
+        ProfileBuilder.PassengerProfileBuilder b =
+                builder.withPassengerCharacter();
+
+        JsonNode cardnode = node.get(KEY_CREDIT_CARD);
+
+        if (cardnode != null) {
+           CreditCard card = CreditCard.empty();
+           card.setNumber(extract(cardnode, KEY_CREDIT_CARD_NUMBER));
+           card.setCvc(extract(cardnode, KEY_CVC));
+           card.setExpirationDate(extract(cardnode, KEY_EXPIRATION));
+           b.withCreditCard(card);
+        }
     }
 
     private Integer extractInteger(JsonNode node, String key) {

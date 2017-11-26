@@ -710,7 +710,6 @@ public class MainScreenActivity extends LlevameActivity implements
         sendInCarNotification();
         removeDriverMarker();
         statevector.setKey(StateKey.ON_TRIP);
-        statevector.setDriver(null);
         statevector.persist(getApplicationContext());
         sendInCarToServer();
         initializeOnTrip();
@@ -740,7 +739,7 @@ public class MainScreenActivity extends LlevameActivity implements
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onReceiveInCar(ReceiveInCar event) {
         if (statevector.isLastRequestId(event.getRequestId())) {
-            statevector.setPassenger(null);
+            statevector.setKey(StateKey.ON_TRIP);
             statevector.persist(getApplicationContext());
             removePassengerMarker();
             initializeOnTrip();
@@ -750,12 +749,14 @@ public class MainScreenActivity extends LlevameActivity implements
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSendFinishTrip(SendFinishTrip event) {
         event.setRequestId(statevector.getLastRequestId());
+        displayConfirmationDialog("Finishing Trip", "Please wait...");
         finishTrip();
         // TODO: Actual notification response will come from server!
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onReceiveFinishTrip(ReceiveFinishTrip event) {
+        dismissDialog();
         ProfileRepositoryFactory f = new ProfileRepositoryFactory();
         ProfileRepository r = f.getRepository(getApplicationContext());
         Profile p = r.retrieveCached();

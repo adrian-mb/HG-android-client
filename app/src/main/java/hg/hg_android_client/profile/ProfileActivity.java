@@ -110,7 +110,7 @@ public class ProfileActivity extends LlevameActivity {
         } else if (profile.isPassenger()) {
             checkRadio(R.id.radio_passenger);
             disableRadio(R.id.radio_driver);
-            arguments.putSerializable(KEY_CARD, null);
+            arguments.putSerializable(KEY_CARD, profile.getCard());
             fragment = new PassengerProfileFragment();
         }
 

@@ -5,26 +5,38 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 
 public class CreditCard implements Serializable {
-    private final String number;
-    private final String securityCode;
-    private final String expirationDate;
+    private String number;
+    private String cvc;
+    private String expirationDate;
 
     public static CreditCard empty() {
         return new CreditCard("", "", "");
     }
 
-    public CreditCard(String number, String securityCode, String expirationDate) {
+    public CreditCard(String number, String cvc, String expirationDate) {
         this.number = number;
-        this.securityCode = securityCode;
+        this.cvc = cvc;
         this.expirationDate = expirationDate;
+    }
+
+    public void setNumber(String number) {
+        this.number = number;
     }
 
     public String getNumber() {
         return number;
     }
 
-    public String getSecurityCode() {
-        return securityCode;
+    public void setCvc(String cvc) {
+        this.cvc = cvc;
+    }
+
+    public String getCvc() {
+        return cvc;
+    }
+
+    public void setExpirationDate(String expirationDate) {
+        this.expirationDate = expirationDate;
     }
 
     public String getExpirationDate() {
@@ -33,7 +45,7 @@ public class CreditCard implements Serializable {
 
     @JsonIgnore
     public boolean isComplete() {
-        return hasValue(number) && hasValue(securityCode) && hasValue(expirationDate);
+        return hasValue(number) && hasValue(cvc) && hasValue(expirationDate);
     }
 
     private boolean hasValue(String field) {

@@ -87,6 +87,10 @@ public class LlevameActivity extends AppCompatActivity {
         }
     }
 
+    protected void displayConfirmationDialog(String title, String message) {
+        displayConfirmationDialog(title, message, null, null);
+    }
+
     protected void displayConfirmationDialog(
             String message,
             String buttonMessage,
@@ -102,7 +106,11 @@ public class LlevameActivity extends AppCompatActivity {
         AlertDialog dialog = new AlertDialog.Builder(this).create();
         dialog.setTitle(title);
         dialog.setMessage(message);
-        dialog.setButton(AlertDialog.BUTTON_NEUTRAL, buttonMessage, handler);
+
+        if (handler != null) {
+            dialog.setButton(AlertDialog.BUTTON_NEUTRAL, buttonMessage, handler);
+        }
+
         dialog.show();
     }
 

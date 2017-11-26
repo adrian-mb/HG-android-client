@@ -63,7 +63,7 @@ public class ProfileBuilder {
     public class PassengerProfileBuilder {
 
         public PassengerProfileBuilder withCreditCard(CreditCard creditCard) {
-            built.setCreditCard(creditCard);
+            built.setCard(creditCard);
             return this;
         }
 

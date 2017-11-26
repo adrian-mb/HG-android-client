@@ -33,7 +33,7 @@ public class PassengerProfileFragment extends Fragment {
         updateTextView(expirationContainer, R.id.label, R.string.profile_expiration_date);
 
         updateEditText(cardnumberContainer, R.id.edit_field, c.getNumber());
-        updateEditText(securitycodeContainer, R.id.edit_field, c.getSecurityCode());
+        updateEditText(securitycodeContainer, R.id.edit_field, c.getCvc());
         updateEditText(expirationContainer, R.id.edit_field, c.getExpirationDate());
     }
 

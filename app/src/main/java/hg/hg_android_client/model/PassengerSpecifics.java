@@ -12,7 +12,7 @@ public class PassengerSpecifics implements ProfileSpecifics, Serializable {
 
     @Override
     public boolean detailsComplete() {
-        CreditCard creditCard = parent.getCreditCard();
+        CreditCard creditCard = parent.getCard();
         return creditCard != null && creditCard.isComplete();
     }
 
