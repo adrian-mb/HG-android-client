@@ -49,6 +49,7 @@ import hg.hg_android_client.mainscreen.event.FocusOnMe;
 import hg.hg_android_client.mainscreen.event.FocusOnPassenger;
 import hg.hg_android_client.mainscreen.event.LoadDriverInfo;
 import hg.hg_android_client.mainscreen.event.LoadPassengerInfo;
+import hg.hg_android_client.mainscreen.event.PartnerPositionUpdate;
 import hg.hg_android_client.mainscreen.event.ReceiveFinishTrip;
 import hg.hg_android_client.mainscreen.event.ReceiveInCar;
 import hg.hg_android_client.mainscreen.event.ReceivedCancelTrip;
@@ -183,6 +184,16 @@ public class MainScreenActivity extends LlevameActivity implements
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onLocationUpdate(UpdateLocation event) {
         updateLocation(event.getLocation());
+        if (statevector != null && statevector.isDriverMeetingPassenger()) {
+            Context context = getApplicationContext();
+            Long target = statevector.getPassenger().getUserId();
+            MessageType type = MessageType.PARTNER_UPDATE;
+            PartnerPositionUpdate p = new PartnerPositionUpdate();
+            p.setLatitude(event.getLocation().latitude);
+            p.setLongitude(event.getLocation().longitude);
+            SendMessageIntent i = new SendMessageIntent(context, target, type, p);
+            startService(i);
+        }
     }
 
     private void updateLocation(LatLng position) {
@@ -687,6 +698,17 @@ public class MainScreenActivity extends LlevameActivity implements
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onPartnerPositionUpdate(PartnerPositionUpdate event) {
+        Location location = new Location(event.getLatitude(), event.getLongitude());
+        if (statevector.isPassengerWaitingForDriver()) {
+            statevector.getDriver().setLocation(location);
+            updateDriverMarker(statevector.getDriver());
+        } else if (statevector.isDriverMeetingPassenger()) {
+            // TODO: Implement.
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onReceivedCancelTrip(ReceivedCancelTrip event) {
         String message = null;
         if (statevector.isLastRequestId(event.getRequestId())) {
@@ -787,9 +809,9 @@ public class MainScreenActivity extends LlevameActivity implements
         String report = "";
 
         if (p.isPassenger()) {
-            report = "Payment has been confirmed; " + cost + " were charged to your credit card.";
+            report = "Payment has been submitted; " + cost + " will be charged to your credit card.";
         } else if (p.isDriver()) {
-            report = "Payment has been confirmed; earnings will soon be credited to your account.";
+            report = "Payment has been submitted; earnings will soon be credited to your account.";
         }
 
         TripReportDialog reportDialog = new TripReportDialog(this);

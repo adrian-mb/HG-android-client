@@ -7,5 +7,6 @@ public enum MessageType {
     CANCEL_TRIP,
     IN_CAR,
     FINISH_TRIP,
-    CHAT_MESSAGE
+    CHAT_MESSAGE,
+    PARTNER_UPDATE
 }

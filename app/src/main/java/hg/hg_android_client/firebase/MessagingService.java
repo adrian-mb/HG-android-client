@@ -12,6 +12,7 @@ import hg.hg_android_client.mainscreen.chat_client.ChatMessage;
 import hg.hg_android_client.mainscreen.chat_client.ChatMessageRepository;
 import hg.hg_android_client.mainscreen.event.DeclineTripRequest;
 import hg.hg_android_client.mainscreen.event.DriverTripConfirmation;
+import hg.hg_android_client.mainscreen.event.PartnerPositionUpdate;
 import hg.hg_android_client.mainscreen.event.ReceiveFinishTrip;
 import hg.hg_android_client.mainscreen.event.ReceiveInCar;
 import hg.hg_android_client.mainscreen.event.ReceivedCancelTrip;
@@ -57,6 +58,10 @@ public class MessagingService extends FirebaseMessagingService {
                 ChatMessageRepository r = new ChatMessageRepository(getApplicationContext());
                 r.receive(message);
                 EventBus.getDefault().post(message);
+                break;
+            case PARTNER_UPDATE:
+                PartnerPositionUpdate update = fromJson(payload, PartnerPositionUpdate.class);
+                EventBus.getDefault().post(update);
                 break;
         }
     }
