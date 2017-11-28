@@ -17,6 +17,11 @@ public class ReceiveFinishTrip {
         return cost.toString();
     }
 
+    @JsonIgnore
+    public String getDistanceString() {
+        return String.valueOf(distance) + " Km";
+    }
+
     public Address getStart() {
         return start;
     }

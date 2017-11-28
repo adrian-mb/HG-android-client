@@ -107,6 +107,10 @@ public class StateVector {
         return driver;
     }
 
+    public boolean isEngaged() {
+        return isPassengerWaitingForDriver() || isDriverMeetingPassenger() || isOnTrip();
+    }
+
     public boolean isPassengerPickingDestination() {
         return StateKey.PASSENGER_SELECT_DESTINATION.equals(key);
     }

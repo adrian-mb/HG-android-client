@@ -133,4 +133,18 @@
     <string name="driver_declined">Driver %1$s declined trip request</string>
     <string name="driver_cancelled">Driver %1$s cancelled trip</string>
 
+    <string name="option_blocked">You cannot do this while on trip</string>
+
+    <string name="find_my_position">Find my position in map</string>
+    <string name="currently_on_trip">Currently on trip.\nTap button below to finalize.</string>
+
+    <string name="finishing_trip">Finishing Trip</string>
+
+    <string name="trip_finished">Trip Finished</string>
+
+    <string name="report_title">Trip Finished</string>
+
+    <string name="distance">Distance:</string>
+    <string name="cost">Total Cost:</string>
+
 </resources>

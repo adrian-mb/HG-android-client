@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -37,6 +38,7 @@ import hg.hg_android_client.mainscreen.driver_confirm.DriverConfirmFragment;
 import hg.hg_android_client.mainscreen.driver_idle.DriverIdleFragment;
 import hg.hg_android_client.mainscreen.driver_idle.Passenger;
 import hg.hg_android_client.mainscreen.driver_meet_passenger.DriverMeetPassengerFragment;
+import hg.hg_android_client.mainscreen.event.FocusOnMe;
 import hg.hg_android_client.mainscreen.event.ReceiveFinishTrip;
 import hg.hg_android_client.mainscreen.event.ReceiveInCar;
 import hg.hg_android_client.mainscreen.event.SendCancelTrip;
@@ -60,6 +62,7 @@ import hg.hg_android_client.mainscreen.event.SendSelectMessage;
 import hg.hg_android_client.mainscreen.event.ShowPath;
 import hg.hg_android_client.mainscreen.event.UpdateDestination;
 import hg.hg_android_client.mainscreen.on_trip.OnTripFragment;
+import hg.hg_android_client.mainscreen.on_trip.TripReportDialog;
 import hg.hg_android_client.mainscreen.on_trip.TripRepository;
 import hg.hg_android_client.mainscreen.select_destination.SelectDestinationFragment;
 import hg.hg_android_client.mainscreen.select_driver.Driver;
@@ -206,6 +209,11 @@ public class MainScreenActivity extends LlevameActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (statevector.isEngaged()) {
+            displayToastCentered(getString(R.string.option_blocked));
+            return true;
+        }
+
         switch(item.getItemId()) {
             case R.id.menu_profile_action:
                 handleGoToProfile();
@@ -565,6 +573,12 @@ public class MainScreenActivity extends LlevameActivity implements
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
+    private void displayToastCentered(String message) {
+        Toast t = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+        t.setGravity(Gravity.CENTER, 0, 0);
+        t.show();
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onConfirmTripRequest(ConfirmTrip event) {
         if (statevector.isLastRequestId(event.getRequestId())) {
@@ -691,6 +705,13 @@ public class MainScreenActivity extends LlevameActivity implements
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onFocusOnMe(FocusOnMe event) {
+        if (locationMarker != null) {
+            map.moveCamera(CameraUpdateFactory.newLatLng(locationMarker.getPosition()));
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onFocusOnPassenger(FocusOnPassenger event) {
         if (passengerMarker != null) {
             map.moveCamera(CameraUpdateFactory.newLatLng(passengerMarker.getPosition()));
@@ -749,7 +770,7 @@ public class MainScreenActivity extends LlevameActivity implements
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSendFinishTrip(SendFinishTrip event) {
         event.setRequestId(statevector.getLastRequestId());
-        displayConfirmationDialog("Finishing Trip", "Please wait...");
+        showDialog(getString(R.string.finishing_trip), getString(R.string.please_wait));
         finishTrip();
         // TODO: Actual notification response will come from server!
     }
@@ -761,25 +782,23 @@ public class MainScreenActivity extends LlevameActivity implements
         ProfileRepository r = f.getRepository(getApplicationContext());
         Profile p = r.retrieveCached();
 
-        String title = "Trip Finished";
-        String message = "";
-
         String cost = event.getCostString();
+        String distance = event.getDistanceString();
+        String report = "";
 
         if (p.isPassenger()) {
-            message = cost + " will be debited from your credit card.";
+            report = "Payment has been confirmed; " + cost + " were charged to your credit card.";
         } else if (p.isDriver()) {
-            message = cost + " has been charged to the passenger and added to your balance.";
+            report = "Payment has been confirmed; earnings will soon be credited to your account.";
         }
 
-        displayConfirmationDialog(title, message, "OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int i) {
-                dialog.dismiss();
-            }
-        });
+        TripReportDialog reportDialog = new TripReportDialog(this);
+        reportDialog.setDistance(distance);
+        reportDialog.setCost(cost);
+        reportDialog.setReport(report);
 
         cleanState();
+        reportDialog.show();
         initializeFragment();
     }
 

@@ -12,6 +12,7 @@ import android.widget.Button;
 import org.greenrobot.eventbus.EventBus;
 
 import hg.hg_android_client.R;
+import hg.hg_android_client.mainscreen.event.FocusOnMe;
 import hg.hg_android_client.mainscreen.event.SendFinishTrip;
 
 public class OnTripFragment extends Fragment {
@@ -19,8 +20,19 @@ public class OnTripFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle state) {
         View view = inflater.inflate(R.layout.fragment_on_trip, container, false);
+        initializeFindMeButton(view);
         initializeFinishTrip(view);
         return view;
+    }
+
+    private void initializeFindMeButton(View layout) {
+        Button b = (Button) layout.findViewById(R.id.button_find_position);
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EventBus.getDefault().post(new FocusOnMe());
+            }
+        });
     }
 
     private void initializeFinishTrip(View layout) {

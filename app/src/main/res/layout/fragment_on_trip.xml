@@ -4,6 +4,21 @@
     android:layout_height="match_parent">
 
     <Button
+        android:id="@+id/button_find_position"
+        android:layout_alignParentTop="true"
+        android:text="@string/find_my_position"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:gravity="center"
+        android:text="@string/currently_on_trip"
+        android:layout_below="@id/button_find_position"
+        android:layout_above="@id/button_finish_trip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
         android:id="@+id/button_finish_trip"
         android:text="@string/finish_trip"
         android:backgroundTint="@android:color/holo_orange_light"
