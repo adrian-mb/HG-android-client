@@ -23,7 +23,8 @@
         <activity
             android:name=".mainscreen.MainScreenActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan"/>
 
         <activity
             android:name=".login.LoginActivity"

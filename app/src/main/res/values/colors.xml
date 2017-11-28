@@ -7,4 +7,7 @@
 
     <color name="colorChatSent">#AAEEFFEE</color>
     <color name="colorChatReceived">#AAFFFFEE</color>
+
+    <color name="colorChatReceivedButton">#FFFFFFEE</color>
+
 </resources>

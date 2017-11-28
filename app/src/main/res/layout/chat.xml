@@ -59,9 +59,11 @@
         android:layout_above="@id/controls"
         android:layout_below="@id/header"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:isScrollContainer="false">
 
         <LinearLayout
+            android:layout_gravity="bottom"
             android:id="@+id/chat_body"
             android:orientation="vertical"
             android:layout_width="match_parent"

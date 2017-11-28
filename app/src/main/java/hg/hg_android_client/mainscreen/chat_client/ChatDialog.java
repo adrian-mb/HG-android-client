@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -112,7 +113,9 @@ public class ChatDialog extends Dialog {
 
     private void scrollBottom() {
         ScrollView scroll = (ScrollView) findViewById(R.id.scrollbar);
-        scroll.scrollTo(0, scroll.getBottom());
+        scroll.invalidate();
+        scroll.requestLayout();
+        scroll.fullScroll(ScrollView.FOCUS_DOWN);
     }
 
     @Override

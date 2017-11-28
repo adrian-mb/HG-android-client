@@ -2,6 +2,8 @@ package hg.hg_android_client.mainscreen.driver_meet_passenger;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,12 +12,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import hg.hg_android_client.R;
 import hg.hg_android_client.mainscreen.chat_client.ChatDialog;
+import hg.hg_android_client.mainscreen.chat_client.ChatMessage;
 import hg.hg_android_client.mainscreen.event.SendCancelTrip;
+import hg.hg_android_client.util.LlevameFragment;
 
-public class DriverMeetPassengerFragment extends Fragment {
+public class DriverMeetPassengerFragment extends LlevameFragment {
 
     private ChatDialog chat;
 
@@ -33,6 +39,7 @@ public class DriverMeetPassengerFragment extends Fragment {
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                resetButtonColor();
                 chat.show();
             }
         });
@@ -65,6 +72,19 @@ public class DriverMeetPassengerFragment extends Fragment {
                 b.show();
             }
         });
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onChatMessage(ChatMessage message) {
+        Button b = (Button) getView().findViewById(R.id.button_chat);
+        b.getBackground().setColorFilter(
+                getResources().getColor(R.color.colorChatReceivedButton),
+                PorterDuff.Mode.MULTIPLY);
+    }
+
+    private void resetButtonColor() {
+        Button b = (Button) getView().findViewById(R.id.button_chat);
+        b.getBackground().clearColorFilter();
     }
 
     public void onDestroy() {
