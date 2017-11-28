@@ -11,7 +11,7 @@
         android:layout_height="wrap_content">
 
         <Button
-            android:backgroundTint="@android:color/holo_green_light"
+            android:backgroundTint="@color/buttonPositive"
             android:layout_weight="1"
             android:id="@+id/button_confirm"
             android:text="@string/button_confirm"
@@ -19,7 +19,7 @@
             android:layout_height="wrap_content" />
 
         <Button
-            android:backgroundTint="@android:color/holo_red_light"
+            android:backgroundTint="@color/buttonCareful"
             android:layout_weight="1"
             android:id="@+id/button_cancel"
             android:text="@string/button_cancel"

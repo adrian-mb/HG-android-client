@@ -17,6 +17,7 @@
     </LinearLayout>
 
     <Button
+        android:backgroundTint="@color/colorGrayTransparent"
         android:id="@+id/button_find_passenger"
         android:text="@string/find_passenger"
         android:drawableLeft="@drawable/ic_person_black_24dp"
@@ -24,6 +25,7 @@
         android:layout_height="wrap_content" />
 
     <Button
+        android:backgroundTint="@color/colorGrayTransparent"
         android:id="@+id/button_find_destination"
         android:text="@string/find_destination"
         android:drawableLeft="@drawable/destination"
@@ -37,7 +39,7 @@
 
         <Button
             android:id="@+id/button_accept"
-            android:backgroundTint="@android:color/holo_green_light"
+            android:backgroundTint="@color/buttonPositive"
             android:text="@string/button_confirm"
             android:layout_weight="1"
             android:layout_width="0dp"
@@ -45,7 +47,7 @@
 
         <Button
             android:id="@+id/button_decline"
-            android:backgroundTint="@android:color/holo_red_light"
+            android:backgroundTint="@color/buttonCareful"
             android:text="@string/button_decline"
             android:layout_weight="1"
             android:layout_width="0dp"

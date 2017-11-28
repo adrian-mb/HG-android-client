@@ -10,6 +10,7 @@
         android:layout_height="wrap_content">
 
         <Button
+            android:backgroundTint="@color/colorGrayTransparent"
             android:id="@+id/button_chat"
             android:text="@string/open_chat"
             android:layout_width="match_parent"
@@ -32,14 +33,14 @@
         <Button
             android:id="@+id/button_im_in"
             android:text="@string/im_in"
-            android:backgroundTint="@android:color/holo_green_light"
+            android:backgroundTint="@color/buttonPositive"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <Button
             android:id="@+id/button_cancel_trip"
             android:text="@string/button_cancel_trip"
-            android:backgroundTint="@android:color/holo_red_light"
+            android:backgroundTint="@color/buttonCareful"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 

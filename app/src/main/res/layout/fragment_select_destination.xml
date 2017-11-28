@@ -12,6 +12,7 @@
         android:padding="8dp"/>
 
     <Button
+        android:backgroundTint="@color/colorGrayTransparent"
         android:id="@+id/confirm_destination"
         android:text="@string/select_destination_button"
         android:layout_gravity="center"

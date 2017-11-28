@@ -32,12 +32,14 @@
             android:layout_height="wrap_content">
 
             <Button
+                android:backgroundTint="@color/colorGrayTransparent"
                 android:onClick="loginOnClick"
                 android:text="@string/button_login"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
 
             <Button
+                android:backgroundTint="@color/colorGrayTransparent"
                 android:onClick="signupOnClick"
                 android:text="@string/button_signup"
                 android:layout_width="wrap_content"

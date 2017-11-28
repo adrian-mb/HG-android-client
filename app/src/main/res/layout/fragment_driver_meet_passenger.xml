@@ -26,12 +26,13 @@
     <Button
         android:id="@+id/button_cancel_trip"
         android:text="@string/button_cancel_trip"
-        android:backgroundTint="@android:color/holo_red_light"
+        android:backgroundTint="@color/buttonCareful"
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <Button
+        android:backgroundTint="@color/colorGrayTransparent"
         android:text="@string/open_chat"
         android:id="@+id/button_chat"
         android:layout_above="@id/button_cancel_trip"

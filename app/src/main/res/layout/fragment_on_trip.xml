@@ -8,7 +8,8 @@
         android:layout_alignParentTop="true"
         android:text="@string/find_my_position"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/colorGrayTransparent"/>
 
     <TextView
         android:gravity="center"
@@ -21,7 +22,7 @@
     <Button
         android:id="@+id/button_finish_trip"
         android:text="@string/finish_trip"
-        android:backgroundTint="@android:color/holo_orange_light"
+        android:backgroundTint="@color/colorFinish"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"/>
