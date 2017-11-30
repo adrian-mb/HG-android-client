@@ -699,6 +699,9 @@ public class MainScreenActivity extends LlevameActivity implements
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onPartnerPositionUpdate(PartnerPositionUpdate event) {
+        if (statevector.isOnTrip()) {
+            return;
+        }
         Location location = new Location(event.getLatitude(), event.getLongitude());
         if (statevector.isPassengerWaitingForDriver()) {
             statevector.getDriver().setLocation(location);
